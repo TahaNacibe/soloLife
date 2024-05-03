@@ -11,7 +11,8 @@ import 'package:step_progress_indicator/step_progress_indicator.dart';
 class DailyCard extends StatelessWidget {
   final homeCtrl = Get.find<HomeController>();
   final List<Daily> tasks = DailyTasks().readTasks();
-  DailyCard({super.key});
+  final bool isBox;
+  DailyCard({super.key,required this.isBox});
 
 int finished(){
   int finished = 0;
@@ -26,7 +27,7 @@ int finished(){
   Widget build(BuildContext context) {
     final color = const Color.fromARGB(255, 80, 39, 176);
     var squareWidth = Get.width - 12.0.wp;
-    return GestureDetector(
+    return isBox? GestureDetector(
       onTap: () {
        Navigator.popAndPushNamed(context, "soloDetails");
       },
@@ -109,6 +110,58 @@ int finished(){
             ),
             
           ],
+        ),
+      ),
+    ): GestureDetector(
+      onTap:(){
+         Navigator.popAndPushNamed(context, "soloDetails");
+      },
+      child: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Container( padding: EdgeInsets.all(15),
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(12),
+                              color: Theme.of(context).cardColor,
+                              boxShadow:[BoxShadow(
+                              color: Theme.of(context).shadowColor, // Shadow color
+                              spreadRadius: 1, // Extends the shadow beyond the box
+                              blurRadius: 5, // Blurs the edges of the shadow
+                              offset: const Offset(0, 3), // Moves the shadow slightly down and right
+                              )]
+                            ),
+          child: ListTile(
+            leading: SizedBox(
+              width: 30,
+              height: 30,
+              child: Icon(
+                      Icons.star,
+                      color: color,
+                    ),
+            ),
+                  title: Text(
+                          "Daily Quests",
+                          style: TextStyle(
+                              fontWeight: FontWeight.bold, 
+                              fontFamily: "Quick",
+                              fontSize: 12.0.sp),
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        subtitle:Text(
+                          '${tasks.length} Task',
+                          style: TextStyle(
+                              fontWeight: FontWeight.bold, color: color),
+                        ),
+                        trailing: CircularStepProgressIndicator(
+                          selectedColor: Colors.purple,
+                          unselectedColor: Colors.grey.withOpacity(.4),
+                          padding: 0,
+              totalSteps: tasks.isEmpty? 1 : tasks.length,
+              currentStep: tasks.isEmpty? 0 : finished(),
+              width: 40,
+              height: 40,
+              roundedCap: (_, isSelected) => isSelected,
+          ),
+          ),
         ),
       ),
     );

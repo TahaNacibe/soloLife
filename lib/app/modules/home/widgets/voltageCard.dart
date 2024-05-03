@@ -10,12 +10,13 @@ import 'package:get/get.dart';
 class VoltageCard extends StatelessWidget {
   final homeCtrl = Get.find<HomeController>();
   final List<Daily> tasks = DailyTasks().readTasks();
-  VoltageCard({super.key});
+  final bool isBox;
+  VoltageCard({super.key, required this.isBox});
 
   @override
   Widget build(BuildContext context) {
     var squareWidth = Get.width - 12.0.wp;
-    return GestureDetector(
+    return isBox? GestureDetector(
       onTap: () {
        Navigator.pushNamed(context, "volt");
       },
@@ -77,6 +78,47 @@ class VoltageCard extends StatelessWidget {
             ),
             
           ],
+        ),
+      ),
+    ): GestureDetector(
+      onTap:(){
+         Navigator.pushNamed(context, "volt");
+      },
+      child: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Container( padding: EdgeInsets.all(15),
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(12),
+                              color: Theme.of(context).cardColor,
+                              boxShadow:[BoxShadow(
+                              color: Theme.of(context).shadowColor, // Shadow color
+                              spreadRadius: 1, // Extends the shadow beyond the box
+                              blurRadius: 5, // Blurs the edges of the shadow
+                              offset: const Offset(0, 3), // Moves the shadow slightly down and right
+                              )]
+                            ),
+          child: Row(children: [
+            Container(decoration: BoxDecoration(
+                          color: Colors.white,
+                          shape: BoxShape.circle
+                        ),
+                          child: Image.asset(
+                            width:60.0.sp,
+                            height: 60.0.sp,
+                            'assets/images/thunder.png'),
+                        ),
+
+                   Text(
+                          "Voltage",
+                          style: TextStyle(
+                              fontWeight: FontWeight.bold, 
+                              fontFamily: "Quick",
+                              fontSize: 12.0.sp),
+                          overflow: TextOverflow.ellipsis,
+                        ),
+          ],
+                        
+          ),
         ),
       ),
     );

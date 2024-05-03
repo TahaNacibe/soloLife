@@ -119,12 +119,14 @@ class DailyService{
       timesStamp = DateTime.now();
       task.timeStamp = timesStamp.toIso8601String();
       task.exp = getExpForTheTasks(userInfo.level,task.isFree);
+      task.coins = getCoinsForTheTasks(task.isFree);
       task.isGoing = true;
     } else if (now.year == timesStamp.year && now.month > timesStamp.month) {
       // a month passed
       timesStamp = DateTime.now();
       task.exp = getExpForTheTasks(userInfo.level,task.isFree);
       task.timeStamp = timesStamp.toIso8601String();
+      task.coins = getCoinsForTheTasks(task.isFree);
       task.isGoing = true;
     } else if (now.year == timesStamp.year &&
         now.month == timesStamp.month &&
@@ -133,6 +135,7 @@ class DailyService{
           timesStamp = DateTime.now();
           task.exp = getExpForTheTasks(userInfo.level,task.isFree);
           task.timeStamp = timesStamp.toIso8601String();
+          task.coins = getCoinsForTheTasks(task.isFree);
           task.isGoing = true;
     }
     }

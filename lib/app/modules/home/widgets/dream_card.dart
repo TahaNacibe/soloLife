@@ -10,12 +10,13 @@ import 'package:step_progress_indicator/step_progress_indicator.dart';
 class DreamCard extends StatelessWidget {
   final homeCtrl = Get.find<HomeController>();
   final Task task;
-  DreamCard({super.key, required this.task});
+  final bool isBox;
+  DreamCard({super.key, required this.task, required this.isBox});
 
  @override
   Widget build(BuildContext context) {
     var squareWidth = Get.width - 12.0.wp;
-    return GestureDetector(
+    return isBox? GestureDetector(
       onTap: () {
         homeCtrl.changeTask(task);
         homeCtrl.changeTodos(task.todos ?? []);
@@ -99,6 +100,78 @@ class DreamCard extends StatelessWidget {
           ],
         ),
       ),
+    ): GestureDetector(
+      onTap:(){
+        homeCtrl.changeTask(task);
+        homeCtrl.changeTodos(task.todos ?? []);
+        Get.to(() => DreamPage());
+      },
+      child: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Container( padding: EdgeInsets.all(15),
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(12),
+                              color: Theme.of(context).cardColor,
+                              boxShadow:[BoxShadow(
+                              color: Theme.of(context).shadowColor, // Shadow color
+                              spreadRadius: 1, // Extends the shadow beyond the box
+                              blurRadius: 5, // Blurs the edges of the shadow
+                              offset: const Offset(0, 3), // Moves the shadow slightly down and right
+                              )]
+                            ),
+          child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Row(
+                    children: [
+                     SizedBox(
+              width: 30,
+              height: 30,
+              child: Icon(
+                IconData(task.icon, fontFamily: 'MaterialIcons'),
+                color: Colors.orange,
+              ),
+            ),
+                      SizedBox(width: 8),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                          task.title,
+                          style: TextStyle(
+                              fontWeight: FontWeight.bold, 
+                              fontFamily: "Quick",
+                              fontSize: 12.0.sp),
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                            SizedBox(height: 4),
+                            Text(
+                          '${task.todos?.length ?? 0} Task',
+                          style: TextStyle(
+                              fontWeight: FontWeight.bold, color: Colors.orange),
+                        ),
+                          ],
+                        ),
+                      ),
+                      CircularStepProgressIndicator(
+                          selectedColor: Colors.orange,
+                          unselectedColor: Colors.grey.withOpacity(.4),
+                          padding: 0,
+              totalSteps: homeCtrl.isTodosEmpty(task) ? 1 : task.todos!.length,
+              currentStep: homeCtrl.isTodosEmpty(task) ? 0 : homeCtrl.getDoneTodo(task),
+              width: 40,
+              height: 40,
+              roundedCap: (_, isSelected) => isSelected,
+          ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          
+          
+          
+        
     );
   }
 }

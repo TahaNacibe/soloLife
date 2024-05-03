@@ -7,7 +7,8 @@ import 'package:get/get.dart';
 
 class ManagerCard extends StatefulWidget {
   final homeCtrl = Get.find<HomeController>();
-  ManagerCard({super.key});
+  final bool isBox;
+  ManagerCard({super.key,required this.isBox});
 
   @override
   State<ManagerCard> createState() => _ManagerCardState();
@@ -19,7 +20,7 @@ class _ManagerCardState extends State<ManagerCard> {
     var squareWidth = Get.width - 12.0.wp;
     List<Budget> log = BudgetProvider().readBudget();
     int total = BudgetProvider().totalGater(log);
-    return GestureDetector(
+    return widget.isBox? GestureDetector(
       onTap:(){
         Navigator.popAndPushNamed(
                     context,
@@ -87,6 +88,53 @@ class _ManagerCardState extends State<ManagerCard> {
               ),
             ),
           ],
+        ),
+      ),
+    ): GestureDetector(
+      onTap:(){
+          Navigator.popAndPushNamed(
+                    context,
+                    "manager"
+                  );
+      },
+      child: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Container( padding: EdgeInsets.all(15),
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(12),
+                              color: Theme.of(context).cardColor,
+                              boxShadow:[BoxShadow(
+                              color: Theme.of(context).shadowColor, // Shadow color
+                              spreadRadius: 1, // Extends the shadow beyond the box
+                              blurRadius: 5, // Blurs the edges of the shadow
+                              offset: const Offset(0, 3), // Moves the shadow slightly down and right
+                              )]
+                            ),
+          child: ListTile(
+            leading: SizedBox(
+              width: 30,
+              height: 30,
+              child: Icon(Icons.money,
+                  color: Colors.green
+                ),
+            ),
+                  title: Text(
+                    "Budget Manager",
+                    style: TextStyle(
+                        fontWeight: FontWeight.bold, 
+                        fontFamily: "Quick",
+                        fontSize: 12.0.sp),
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                        subtitle:Text(
+                    'Credit : $total DA',
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                        fontWeight: FontWeight.bold, color: Colors.green),
+                  ),
+                       
+          ),
         ),
       ),
     );

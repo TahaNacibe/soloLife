@@ -66,7 +66,11 @@ class DoneList extends StatelessWidget {
                                         fontWeight: FontWeight.bold,
                                         fontFamily: "Quick",
                                         color:Colors.blue.withOpacity(.7),
-                                        fontSize: 16), )
+                                        fontSize: 16), ),
+                                         TextSpan(
+                                            text:" coins:${element["coins"] ?? "free"}",
+                                            style: TextStyle(color:Colors.orange)
+                                          )
                                       ])
                                       ,
                                       overflow: TextOverflow.ellipsis,

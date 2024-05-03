@@ -1,6 +1,9 @@
 import 'package:SoloLife/app/core/utils/extensions.dart';
 import 'package:SoloLife/app/modules/home/controller.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
+import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
 
 class DoingList extends StatelessWidget {
@@ -26,7 +29,8 @@ class DoingList extends StatelessWidget {
                     fontWeight: FontWeight.bold,
                     fontSize: 16.0.sp,
                   ),
-                )
+                ),
+                
               ],
             )
           : homeCtrl.doingTodos.isEmpty? 
@@ -34,111 +38,246 @@ class DoingList extends StatelessWidget {
           style: TextStyle(
             fontFamily: "Quick",
             fontWeight: FontWeight.bold),)
-          :ListView(
-              shrinkWrap: true,
-              physics: const ClampingScrollPhysics(),
-              children: [
-                Align(alignment: Alignment.topCenter,
-                  child: Padding(
-                  padding: EdgeInsets.symmetric(
-                    vertical: 2.0.wp,
-                    horizontal: 5.0.wp,
-                  ),
-                  child: Text('OnGoing Tasks (${homeCtrl.doingTodos.length})',
-                      style: TextStyle(
-                        fontSize: 14.0.sp,
-                        fontFamily: "Quick",
-                        fontWeight: FontWeight.bold,
-                      )),
-                                ),
-                ),
-                ...homeCtrl.doingTodos
-                    .map((element) => Dismissible(
-                        key: ObjectKey(element),
-                        direction: DismissDirection.endToStart,
-                        onDismissed: (_) => homeCtrl.deleteDoingTodo(element),
-                        background: Container(
-                          color: Colors.red.withOpacity(0.8),
-                          alignment: Alignment.centerRight,
-                          child: Padding(
-                            padding: EdgeInsets.only(right: 5.0.wp),
-                            child: const Icon(
-                              Icons.delete,
-                              color: Colors.white,
-                            ),
-                          ),
-                        ),
+          :Column(
+            children: [Align(alignment: Alignment.topCenter,
                       child: Padding(
-                            padding: EdgeInsets.symmetric(
-                              vertical: 3.0.wp,
-                              horizontal: 5.0.wp,
-                            ),
-                            child: Column(
-                              children: [
-                                Row(mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Row(
-                                      children: [
-                                        
-                                        Padding(
-                                      padding: EdgeInsets.symmetric(
-                                        horizontal: 4,
-                                      ),
-                                      child: Text.rich(TextSpan(children: [
-                                        TextSpan(text:element['title']+"\n"),
-                                        TextSpan(text:element["exp"] == 0? "Free Quest" : "Exp :${element["exp"]}",style: const TextStyle(
-                                          fontWeight: FontWeight.bold,
-                                          fontFamily: "Quick",
-                                          color:Colors.blue,
-                                          fontSize: 16), )
-                                        ])
-                                        ,
-                                        overflow: TextOverflow.ellipsis,
-                                        style: const TextStyle(
-                                          fontWeight: FontWeight.bold,
-                                          fontFamily: "Quick",
-                                          fontSize: 15),
-                                      ),
+                      padding: EdgeInsets.symmetric(
+                        vertical: 2.0.wp,
+                        horizontal: 5.0.wp,
+                      ),
+                      child: Text('OnGoing Tasks (${homeCtrl.doingTodos.length})',
+                          style: TextStyle(
+                            fontSize: 14.0.sp,
+                            fontFamily: "Quick",
+                            fontWeight: FontWeight.bold,
+                          )),
                                     ),
+                    ),
+              StatefulBuilder(
+                builder: (context,setState) {
+                  return ReorderableListView(
+                    onReorder: (oldIndex, newIndex) {
+                  setState(() {
+                    if (newIndex > oldIndex) {
+                      newIndex -= 1;
+                    }
+                    final item = homeCtrl.doingTodos.removeAt(oldIndex);
+                    homeCtrl.doingTodos.insert(newIndex, item);
+                    homeCtrl.doingTodos.refresh();
+                  });
+                },
+                      shrinkWrap: true,
+                      physics: const ClampingScrollPhysics(),
+                      children: [
+                        ...homeCtrl.doingTodos
+                            .map((element) => Dismissible(
+                                key: ObjectKey(element),
+                                direction: DismissDirection.endToStart,
+                                confirmDismiss: (_) async{
+                                  bottomShit(context,element,(){
+                                    setState((){});
+                                  });
+                                  return false;
+                                },
+                                //homeCtrl.deleteDoingTodo(element),
+                                background: Container(
+                                  color: Colors.red.withOpacity(0.8),
+                                  alignment: Alignment.centerRight,
+                                  child: Padding(
+                                    padding: EdgeInsets.only(right: 5.0.wp),
+                                    child: const Icon(
+                                      Icons.delete,
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                ),
+                              child: Padding(
+                                    padding: EdgeInsets.symmetric(
+                                      vertical: 3.0.wp,
+                                      horizontal: 5.0.wp,
+                                    ),
+                                    child: Column(
+                                      children: [
+                                        Row(mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                          children: [
+                                            Row(
+                                              children: [
+                                                
+                                                Padding(
+                                              padding: EdgeInsets.symmetric(
+                                                horizontal: 4,
+                                              ),
+                                              child: Text.rich(TextSpan(children: [
+                                                TextSpan(text:element['title']+"\n"),
+                                                TextSpan(text:element["exp"] == 0? "Free Quest" : "Exp :${element["exp"]}",style: const TextStyle(
+                                                  fontWeight: FontWeight.bold,
+                                                  fontFamily: "Quick",
+                                                  color:Colors.blue,
+                                                  fontSize: 16), ),
+                                                  TextSpan(
+                                                    text:" coins:${element["coins"] ?? "free"}",
+                                                    style: TextStyle(color:Colors.orange)
+                                                  )
+                                                ])
+                                                ,
+                                                overflow: TextOverflow.ellipsis,
+                                                style: const TextStyle(
+                                                  fontWeight: FontWeight.bold,
+                                                  fontFamily: "Quick",
+                                                  fontSize: 15),
+                                              ),
+                                            ),
+                                              ],
+                                            ),
+                              
+                                                  //
+                                                  SizedBox(
+                                                  width: 20,
+                                                  height: 20,
+                                                  child: Checkbox(
+                                              
+                                                    
+                                                    value: element['done'],
+                                                    onChanged: (value) {
+                                                      element['coins'] = element['coins'] ?? 10;
+                                                      print(element);
+                                                      homeCtrl.doneTodo(element['title'],element["exp"], element['coins']);
+                                                    },
+                                                  ),
+                                                ),
+                                          ],
+                                        ),
+                                        if(!(element == homeCtrl.doingTodos.last))
+                                         Padding(
+                                          padding: EdgeInsets.symmetric(horizontal: 30),
+                                          child: Divider(color:Theme.of(context).iconTheme.color!.withOpacity(.4)),
+                                        )
                                       ],
                                     ),
-                      
-                                          //
-                                          SizedBox(
-                                          width: 20,
-                                          height: 20,
-                                          child: Checkbox(
-                                      
-                                            
-                                            value: element['done'],
-                                            onChanged: (value) {
-                                              homeCtrl.doneTodo(element['title'],element["exp"]);
-                                            },
-                                          ),
-                                        ),
-                                  ],
-                                ),
-                                if(!(element == homeCtrl.doingTodos.last))
-                                 Padding(
-                                  padding: EdgeInsets.symmetric(horizontal: 30),
-                                  child: Divider(color:Theme.of(context).iconTheme.color!.withOpacity(.4)),
-                                )
-                              ],
-                            ),
-                          ),
-                    ))
-                    .toList(),
-                if (homeCtrl.doingTodos.isNotEmpty)
-                  Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 60),
-                    child:  Divider(
-                      color:Theme.of(context).iconTheme.color!.withOpacity(.4),
-                      thickness: 1,
-                    ),
-                  )
-              ],
-            ),
+                                  ),
+                            ))
+                            .toList(),
+                        
+                      ],
+                    );
+                }
+              ),
+            ],
+          ),
     );
   }
+
+  void bottomShit(BuildContext context, var element,void Function() refresh) {
+  showModalBottomSheet(
+    backgroundColor: Colors.transparent,
+    context: context,
+    builder: (BuildContext context) {
+      return StatefulBuilder(
+        builder: (context, setState) {
+          return Container(
+            height: 300,
+            child: Column(
+              children: [
+                Stack(alignment: Alignment.bottomCenter,
+                  children: [
+                      Container(
+                        height: 50,
+                        decoration: BoxDecoration(
+                        color: Theme.of(context).cardColor,
+                        borderRadius: BorderRadius.vertical(top:Radius.circular(15) )
+                      ),),
+                    Align(alignment: Alignment.bottomCenter,
+                      child: Icon(Icons.delete_outline_rounded,color: Colors.red,size: 100,)),
+                  ],
+                ),
+                Container(decoration: BoxDecoration(
+                  color: Theme.of(context).cardColor,
+                  
+                ),
+                  height: 200,
+                  child: Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      mainAxisSize: MainAxisSize.min,
+                      children: <Widget>[
+                        Text.rich(TextSpan(
+                          style: TextStyle(
+                            fontFamily: "Quick",
+                            fontWeight: FontWeight.bold,
+                            fontSize: 18
+                          ),
+                          children:[
+                          TextSpan(
+                            text: "Want to delete ",
+                          ),
+                          TextSpan(
+                            text: "${element['title']} ",
+                            style: TextStyle(
+                              color: Colors.red
+                            )
+                          ),
+                          TextSpan(
+                            text: "?\n"
+                          )
+                        ])),
+                        Text("You wont get any Exp or Credit if you delete it",
+                        style: TextStyle(fontFamily: "Quick",fontWeight: FontWeight.w600),),
+                        SizedBox(height: 20),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          children: [
+                            GestureDetector(
+                              onTap: () {
+                                Navigator.pop(context);
+                                refresh();
+                              },
+                              child: Container(
+                                padding: EdgeInsets.symmetric(horizontal: 12,vertical: 8),
+                                decoration:BoxDecoration(
+                                  borderRadius: BorderRadius.circular(15),
+                                  border: Border.all(color:Colors.blue)
+                                ),
+                                child: Text("Cancel",
+                                style: TextStyle(
+                                  fontFamily: "Quick",
+                                  fontWeight: FontWeight.w700,
+                                  color: Colors.blue,
+                                  fontSize: 17),)),
+                            ),
+                            GestureDetector(
+                              onTap: () {
+                                homeCtrl.deleteDoingTodo(element);
+                                homeCtrl.updateTodos();
+                                setState(() {}); // Refresh the UI
+                                Navigator.pop(context); // Close the bottom sheet
+                              },
+                              child: Container(
+                                padding: EdgeInsets.symmetric(horizontal: 12,vertical: 8),
+                                decoration:BoxDecoration(
+                                  borderRadius: BorderRadius.circular(15),
+                                  border: Border.all(color:Colors.red)
+                                ),
+                                child: Text("Delete",
+                                style: TextStyle(
+                                  fontFamily: "Quick",
+                                  fontWeight: FontWeight.w700,
+                                  color: Colors.red,
+                                  fontSize: 17),)),
+                            )
+                          ],
+                        )
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          );
+        },
+      );
+    },
+  );
+}
+
 }
 

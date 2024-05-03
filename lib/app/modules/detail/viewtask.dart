@@ -18,9 +18,7 @@ class DetailPage extends StatelessWidget {
     return PopScope(
       canPop: true,
       onPopInvoked: (_){
-        homeCtrl.updateTodos();
-        homeCtrl.changeTask(null);
-        homeCtrl.editCtrl.clear();
+
       },
       child: Scaffold(
           body: Form(
@@ -36,7 +34,7 @@ class DetailPage extends StatelessWidget {
                     onPressed: () {
                       Get.back();
                       homeCtrl.updateTodos();
-                      homeCtrl.changeTask(null);
+                      //homeCtrl.changeTask(null);
                       homeCtrl.editCtrl.clear();
                     },
                     icon: const Icon(Icons.arrow_back),
@@ -57,9 +55,11 @@ class DetailPage extends StatelessWidget {
                       offset: const Offset(0, 3), // Moves the shadow slightly down and right
                       )]
                       ),
-                child: Column(children:[Row(
+                child: Column(children:[
+                  Row(
                   children: [
-                    Container(padding: const EdgeInsets.all(12),
+                    Container(
+                      padding: const EdgeInsets.all(12),
                       decoration:BoxDecoration(
                 color: color,
                 borderRadius: const BorderRadius.only(
@@ -159,6 +159,8 @@ class DetailPage extends StatelessWidget {
                               homeCtrl.addTodo(homeCtrl.editCtrl.text);
                           if (success) {
                             EasyLoading.showSuccess('Todo item add success');
+                            homeCtrl.updateTodos();
+                              //homeCtrl.changeTask(null);
                           } else {
                             EasyLoading.showError('Todo item already exists');
                           }
@@ -200,6 +202,14 @@ class DetailPage extends StatelessWidget {
                   children: [
               
                     DoingList(),
+                      Padding(
+                        key: UniqueKey(),
+                        padding: EdgeInsets.symmetric(horizontal: 60),
+                        child:  Divider(
+                          color:Theme.of(context).iconTheme.color!.withOpacity(.4),
+                          thickness: 1,
+                        ),
+                      ),
                 DoneList(),
                   ],
                 ),

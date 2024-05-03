@@ -176,6 +176,29 @@ class ReportPage extends StatelessWidget {
                   "assets/images/trophy.png"),
                   Text("check your achievements here ",style: TextStyle(fontFamily: "Quick",fontWeight: FontWeight.bold),)
               ],),)),
+          ),
+          Padding(
+            padding: const EdgeInsets.all(40),
+            child: GestureDetector(
+              onTap:(){
+                 Navigator.pushNamed(context, "Shop");
+              },
+              child: Container(
+                padding: EdgeInsets.all(15),
+                decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(12),
+                color: Theme.of(context).cardColor,
+                boxShadow:[BoxShadow(
+          color: Theme.of(context).shadowColor, // Shadow color
+          spreadRadius: 1, // Extends the shadow beyond the box
+          blurRadius: 5, // Blurs the edges of the shadow
+          offset: const Offset(0, 3), // Moves the shadow slightly down and right
+          )]
+              ),
+                child:
+              Row(children: [
+                  Text("Shop ",style: TextStyle(fontFamily: "Quick",fontWeight: FontWeight.bold),)
+              ],),)),
           )
           ],
         );

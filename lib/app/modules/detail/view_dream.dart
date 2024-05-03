@@ -166,6 +166,7 @@ class DreamPage extends StatelessWidget {
                               homeCtrl.addTodo(homeCtrl.editCtrl.text);
                           if (success) {
                             EasyLoading.showSuccess('Todo item add success');
+                             homeCtrl.updateTodos();
                           } else {
                             EasyLoading.showError('Todo item already exists');
                           }

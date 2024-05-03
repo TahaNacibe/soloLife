@@ -6,6 +6,8 @@ import 'package:SoloLife/app/modules/detail/manager.dart';
 import 'package:SoloLife/app/modules/detail/view_solo.dart';
 import 'package:SoloLife/app/modules/detail/voltageView.dart';
 import 'package:SoloLife/app/modules/home/loading_Screen.dart';
+import 'package:SoloLife/app/modules/report/invintory.dart';
+import 'package:SoloLife/app/modules/report/shop.dart';
 import 'package:SoloLife/app/modules/report/viewAchivments.dart';
 import 'package:flutter/material.dart';
 import 'package:SoloLife/app/data/services/storage/services.dart';
@@ -28,7 +30,7 @@ void main() async {
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
   @override
-  Widget build(BuildContext context) {
+   build(BuildContext context) {
     bool them = ThemeProvider().loadTheme();
     return GetMaterialApp(
       theme:them? ThemeData.dark() : lightTheme,
@@ -38,7 +40,9 @@ class MyApp extends StatelessWidget {
         "HomePage" :(context) => const HomePage(),
         "manager" :(context) => const BudgetManager(),
         "achievements" :(context) => const AchievementsPage(),
-        "volt": (context) => const VoltageView()
+        "volt": (context) => const VoltageView(),
+        "Shop": (context) => const Shop(),
+        "Inventory": (context) => const Inventory()
       },
       title: 'Todo list',
       debugShowCheckedModeBanner: false,

@@ -4,6 +4,7 @@ import 'package:SoloLife/app/data/providers/task/provider.dart';
 import 'package:SoloLife/app/data/services/expScal/exp.dart';
 import 'package:SoloLife/app/data/services/voiceCommand/service.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:get/get.dart';
 import 'package:step_progress_indicator/step_progress_indicator.dart';
@@ -31,12 +32,13 @@ class _SoloDetailState extends State<SoloDetail> {
     bool isFree = false;
     final  RxInt totalTodos =
                       tasks.length.obs;
-    void addTask(String title,bool free,int getExp,String time){
+    void addTask(String title,bool free,int getExp,String time,int getCoins){
       tasks.add(
                                     Daily(
                                       isFree: free,
                                       title: title, 
                                       exp: getExp,
+                                      coins: getCoins,
                                       timeStamp: time));
     }
     return Scaffold(
@@ -179,7 +181,7 @@ class _SoloDetailState extends State<SoloDetail> {
                                   title = title.replaceAll("--free", "");
                                   isFree = true;
                               }
-                                addTask(title, isFree, getExpForTheTasks(level,isFree)*point, time);
+                                addTask(title, isFree, getExpForTheTasks(level,isFree)*point, time,getCoinsForTheTasks(isFree));
                                       DailyTasks().writeTasks(tasks);
                                       EasyLoading.showSuccess('Todo item add success');
                                       setState(() {});
@@ -235,7 +237,18 @@ class _SoloDetailState extends State<SoloDetail> {
                                       fontWeight: FontWeight.bold,
                                       fontFamily: "Quick")),
                     ),
-                    ListView.builder(
+                    ReorderableListView.builder(
+                        onReorder: (oldIndex, newIndex) {
+    setState(() {
+      if (newIndex > oldIndex) {
+        newIndex -= 1;
+      }
+      final item = onGoing.removeAt(oldIndex);
+      onGoing.insert(newIndex, item);
+      tasks = onGoing + finished;
+      widget.dailyTasksController.writeTasks(tasks);
+    });
+  },
                       physics:const NeverScrollableScrollPhysics(),
                       shrinkWrap: true,
                       itemCount: onGoing.length,
@@ -244,6 +257,7 @@ class _SoloDetailState extends State<SoloDetail> {
                         if(task.standard){
                         Map quest = mainQuests(task.title,level,userInfo.keys!.contains('monster'));
                           return Column(
+                            key: ValueKey(task.title),
                             children: [
                               CheckboxListTile(
                                 title: Text.rich(
@@ -251,20 +265,24 @@ class _SoloDetailState extends State<SoloDetail> {
                                     TextSpan(text:quest['title']),
                                     const TextSpan(text:' ['),
                                     TextSpan(text: "${quest['number']}",style:const TextStyle(color:Colors.purple)),
-                                    const TextSpan(text:"]")
+                                    const TextSpan(text:"]"),
+                                     
                                   ]),
                                   style: const TextStyle(
                                     fontWeight: FontWeight.bold,
                                     fontFamily: "Quick"),),
-                                    subtitle: Text(task.exp == 0? "Free Quest" : "Exp :${task.exp}"
-                                    ,style: const TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    color:Colors.blue,
-                                    fontFamily: "Quick")),
+                                    subtitle: Text.rich(
+                                          TextSpan(children:[TextSpan(
+                                            text:task.exp == 0? "Free Quest" : "Exp :${task.exp}",
+                                          ),TextSpan(
+                                            text:" coins:${task.coins ?? "free"}",
+                                            style: TextStyle(color:Colors.orange)
+                                          )])),
                                 value: !task.isGoing, // Checkbox value negation for completed tasks
                                 onChanged: (value){
                                   task.isGoing = !task.isGoing;
                                   addExp(task.exp);
+                                  addCoins(task.coins);
                                   widget.dailyTasksController.writeTasks(tasks);
                                   setState((){});                      
                                 },
@@ -292,13 +310,12 @@ class _SoloDetailState extends State<SoloDetail> {
                               ),
                             ),
                           ),
-                          onDismissed: (_){
-                            if(!task.standard){
-                            tasks.remove(onGoing[index]);
-                            widget.dailyTasksController.writeTasks(tasks);
-                            setState((){});
-                            }
-                          },
+                          confirmDismiss: (_) async{
+                              bottomShit(context,onGoing[index],(){
+                                setState((){});
+                              });
+                              return false;
+                            },
                           child: Column(
                             children: [
                               CheckboxListTile(
@@ -310,12 +327,22 @@ class _SoloDetailState extends State<SoloDetail> {
                                     if(quest['number'] != "")
                                     TextSpan(text: "${quest['number']}",style:const TextStyle(color:Colors.purple)),
                                     if(quest['number'] != "")
-                                    const TextSpan(text:"]")
+                                    const TextSpan(text:"]"),
+                                    
                                   ]),
                                   style: const TextStyle(
                                     fontWeight: FontWeight.bold,
                                     fontFamily: "Quick"),),
-                                        subtitle: Text(task.exp == 0? "Free Quest" : "Exp :${task.exp}",
+                                        subtitle: Text.rich(
+                                          TextSpan(children:[
+                                            TextSpan(
+                                            text:" coins:${task.coins}",
+                                            style: TextStyle(color:Colors.orange)
+                                          ),
+                                            TextSpan(
+                                            text:task.exp == 0? "Free Quest" : "Exp :${task.exp}",
+                                          ),]),
+                                          
                                         style: const TextStyle(
                                     fontWeight: FontWeight.bold,
                                     color:Colors.blue,
@@ -450,4 +477,118 @@ class _SoloDetailState extends State<SoloDetail> {
       ),
     );
   }
+
+void bottomShit(BuildContext context, Daily element,void Function() refresh) {
+  showModalBottomSheet(
+    backgroundColor: Colors.transparent,
+    context: context,
+    builder: (BuildContext context) {
+      return StatefulBuilder(
+        builder: (context, setState) {
+          return Container(
+            height: 300,
+            child: Column(
+              children: [
+                Stack(alignment: Alignment.bottomCenter,
+                  children: [
+                      Container(
+                        height: 50,
+                        decoration: BoxDecoration(
+                        color: Theme.of(context).cardColor,
+                        borderRadius: BorderRadius.vertical(top:Radius.circular(15) )
+                      ),),
+                    Align(alignment: Alignment.bottomCenter,
+                      child: Icon(Icons.delete_sweep_outlined,color: Colors.red,size: 100,)),
+                  ],
+                ),
+                Container(decoration: BoxDecoration(
+                  color: Theme.of(context).cardColor,
+                  
+                ),
+                  height: 200,
+                  child: Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      mainAxisSize: MainAxisSize.min,
+                      children: <Widget>[
+                        Text.rich(TextSpan(
+                          style: TextStyle(
+                            fontFamily: "Quick",
+                            fontWeight: FontWeight.bold,
+                            fontSize: 18
+                          ),
+                          children:[
+                          TextSpan(
+                            text: "Want to delete : ",
+                          ),
+                          TextSpan(
+                            text: "${element.title}",
+                            style: TextStyle(
+                              color: Colors.red
+                            )
+                          ),
+                          TextSpan(
+                            text: "?\n"
+                          )
+                        ])),
+                        Text("You wont get any Exp or Credit if you delete it",
+                        style: TextStyle(fontFamily: "Quick",fontWeight: FontWeight.w600),),
+                        SizedBox(height: 20),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          children: [
+                            GestureDetector(
+                              onTap: () {
+                                Navigator.pop(context);
+                                refresh();
+                              },
+                              child: Container(
+                                padding: EdgeInsets.symmetric(horizontal: 12,vertical: 8),
+                                decoration:BoxDecoration(
+                                  borderRadius: BorderRadius.circular(15),
+                                  border: Border.all(color:Colors.blue)
+                                ),
+                                child: Text("Cancel",
+                                style: TextStyle(
+                                  fontFamily: "Quick",
+                                  fontWeight: FontWeight.w700,
+                                  color: Colors.blue,
+                                  fontSize: 17),)),
+                            ),
+                            GestureDetector(
+                              onTap: () {
+                                tasks.remove(element);
+                            widget.dailyTasksController.writeTasks(tasks);
+                          refresh(); // Refresh the UI
+                          Navigator.pop(context); // Close the bottom sheet
+                              },
+                              child: Container(
+                                padding: EdgeInsets.symmetric(horizontal: 12,vertical: 8),
+                                decoration:BoxDecoration(
+                                  borderRadius: BorderRadius.circular(15),
+                                  border: Border.all(color:Colors.red)
+                                ),
+                                child: Text("Delete",
+                                style: TextStyle(
+                                  fontFamily: "Quick",
+                                  fontWeight: FontWeight.w700,
+                                  color: Colors.red,
+                                  fontSize: 17),)),
+                            )
+                          ],
+                        )
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          );
+        },
+      );
+    },
+  );
 }
+
+}
+

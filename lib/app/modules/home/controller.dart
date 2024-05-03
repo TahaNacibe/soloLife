@@ -106,12 +106,14 @@ class HomeController extends GetxController {
   }
     int level = user.level;
     int exp = getExpForTheTasks(level,isFree);
-    var todo = {'title': title, 'done': false,'exp':exp};
+    int coins = getCoinsForTheTasks(isFree);
+    print("===========$coins");
+    var todo = {'title': title, 'done': false,'exp':exp, 'coins':coins};
     if (doingTodos
         .any((element) => mapEquals<String, dynamic>(todo, element))) {
       return false;
     }
-    var doneTodo = {'title': title, 'done': true, "exp":exp};
+    var doneTodo = {'title': title, 'done': true, "exp":exp, 'coins':coins};
     if (doneTodos
         .any((element) => mapEquals<String, dynamic>(doneTodo, element))) {
       return false;
@@ -126,21 +128,25 @@ class HomeController extends GetxController {
       ...doingTodos,
       ...doneTodos,
     ]);
+    print(task.value);
     var newTask = task.value!.copyWith(todos: newTodos);
+    print(newTask);
     int oldIdx = tasks.indexOf(task.value);
     tasks[oldIdx] = newTask;
     tasks.refresh();
   }
 //? set a subTask as done or not done ??
-  void doneTodo(String title,int addExp) {
-    var doingTodo = {'title': title, 'done': false,"exp":addExp};
+  void doneTodo(String title,int addExp, int coins) {
+    var doingTodo = {'title': title, 'done': false,"exp":addExp, "coins":coins};
     int index = doingTodos.indexWhere(
         (element) => mapEquals<String, dynamic>(doingTodo, element));
+        print("=============$index");
     doingTodos.removeAt(index);
-    var doneTodo = {'title': title, 'done': true,"exp":addExp};
+    var doneTodo = {'title': title, 'done': true,"exp":addExp, "coins":coins};
     doneTodos.add(doneTodo);
     // add the new exp to the user
     userData.exp = userData.exp + addExp;
+    userData.coins = userData.coins + coins;
     ProfileProvider().saveProfile(userData,"exp");
     doingTodos.refresh();
     doneTodos.refresh();

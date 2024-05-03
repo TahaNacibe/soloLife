@@ -24,9 +24,19 @@ int getExpForTheTasks(int currentLevel,isFree){
   final random = math.Random();
   int result = 0;
   // get the xp
-    result = random.nextInt(50 - 20) + 20; // + 1 for inclusive max
+    result = random.nextInt(50 - 20) + 20; // + 20 for inclusive max
     double equalizer = currentLevel == 1? 1 : currentLevel/2;
     result = (result*equalizer).toInt();
+  return isFree? 0 : result;
+}
+
+//? random coins set for the quests
+int getCoinsForTheTasks(isFree){
+  // init the package
+  final random = math.Random();
+  int result = 0;
+  // get the xp
+    result = random.nextInt(30 - 10) + 10; // + 10 for inclusive max
   return isFree? 0 : result;
 }
 
@@ -63,6 +73,13 @@ void addExp(int exp){
   Profile user = ProfileProvider().readProfile();
   user.exp = user.exp + exp;
   ProfileProvider().saveProfile(user, "exp");
+}
+
+//? added coins to player
+void addCoins(int coin){
+  Profile user = ProfileProvider().readProfile();
+  user.coins = user.coins + coin;
+  ProfileProvider().saveProfile(user, "");
 }
 
 //? manage the ranks

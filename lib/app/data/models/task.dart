@@ -17,6 +17,7 @@ class Task extends Equatable {
     String? title,
     int? icon,
     String? color,
+    int? coins,
     List<dynamic>? todos,
   }) =>
       Task(

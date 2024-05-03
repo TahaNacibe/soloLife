@@ -53,8 +53,12 @@ class IconPack {
   static const IconData bowie_knife = IconData(0xe940, fontFamily: _kFontFam, fontPackage: _kFontPkg);
   static const IconData crossbow = IconData(0xe978, fontFamily: _kFontFam, fontPackage: _kFontPkg);
   static const IconData crystal_wand = IconData(0xe984, fontFamily: _kFontFam, fontPackage: _kFontPkg);
+  static const IconData frostfire = IconData(0xe9d7, fontFamily: _kFontFam, fontPackage: _kFontPkg);
   static const IconData health = IconData(0xe9f5, fontFamily: _kFontFam, fontPackage: _kFontPkg);
   static const IconData monster_skull = IconData(0xea43, fontFamily: _kFontFam, fontPackage: _kFontPkg);
+  static const IconData rune_stone = IconData(0xea89, fontFamily: _kFontFam, fontPackage: _kFontPkg);
+  static const IconData trophy = IconData(0xead7, fontFamily: _kFontFam, fontPackage: _kFontPkg);
+  static const IconData coin = IconData(0xeaec, fontFamily: _kFontFam, fontPackage: _kFontPkg);
   static const IconData movie = IconData(0xf040, fontFamily: _kFontFam, fontPackage: _kFontPkg);
   static const IconData shield = IconData(0xf38e, fontFamily: _kFontFam, fontPackage: _kFontPkg);
   static const IconData volleyball_ball = IconData(0xf45f, fontFamily: _kFontFam, fontPackage: _kFontPkg);

@@ -6,6 +6,7 @@ class Daily extends Equatable {
   bool isGoing;
   bool standard;
   String timeStamp;
+  int coins;
   bool isFree;
 
   Daily({
@@ -14,6 +15,7 @@ class Daily extends Equatable {
     this.isGoing = true,
     this.standard = false,
     required this.timeStamp,
+    required this.coins,
     this.isFree = false
   });
 
@@ -23,7 +25,8 @@ class Daily extends Equatable {
     bool? isGoing,
     bool? standard,
     String? timeStamp,
-    bool? isFree
+    bool? isFree,
+    int? coins,
   }) =>
       Daily(
         title: title ?? this.title,
@@ -31,7 +34,8 @@ class Daily extends Equatable {
         isGoing: isGoing ?? false,
         standard: standard ?? false,
         timeStamp: timeStamp ?? this.timeStamp,
-        isFree: isFree ?? false
+        isFree: isFree ?? false,
+        coins: coins ?? this.coins
       );
 
   factory Daily.fromJson(Map<String, dynamic> json) => Daily(
@@ -40,7 +44,8 @@ class Daily extends Equatable {
         isGoing: json['isGoing'],
         standard:json["standard"],
         timeStamp: json["timeStamp"],
-        isFree: json["isFree"] ?? false
+        isFree: json["isFree"] ?? false,
+        coins: json["coins"] ?? 10
       );
 
   Map<String, dynamic> toJson() => {
@@ -49,9 +54,10 @@ class Daily extends Equatable {
         'isGoing': isGoing,
         'standard':standard,
         'timeStamp':timeStamp,
-        'isFree':isFree
+        'isFree':isFree,
+        "coins": coins
       };
 
   @override
-  List<Object?> get props => [title, exp, isGoing,standard,timeStamp];
+  List<Object?> get props => [title, exp, isGoing,standard,timeStamp, coins];
 }

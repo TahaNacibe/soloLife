@@ -47,12 +47,16 @@ Map<String,dynamic> classReword(String job){
   Map<String,dynamic> result = {"message":" error (0o0!)"};
   // get user States 
   UserState state = StatesProvider().readState();
+  //
+  //? in case the job is Healer
   if(job == jobFilter[0]){
     state.mana += 25;
     state.vitality +=25;
     StatesProvider().writeState(state);
     checkAndAdd(jobFilter[0]);
     return {"message":"mana 25 vitality 25"};
+    //
+    //? in case the job is 
   }else if(job == jobFilter[1]){
     state.agility +=35;
     state.sense +=10;
@@ -174,5 +178,5 @@ String convertToRomanNumeral(int number) {
 }
 
 Color colorGater(int counterNumber){
-  return counterNumber >= 20? Colors.purple : counterNumber >=15? Colors.red: counterNumber >= 10? Colors.orange: counterNumber >= 5? Colors.teal :counterNumber < 5? Colors.blue: Colors.blue;
+  return counterNumber >= 20? Colors.purple : counterNumber >=15? Colors.red: counterNumber >= 10? Colors.indigo: counterNumber >= 5? Colors.teal :counterNumber < 5? Colors.blue: Colors.blue;
 }

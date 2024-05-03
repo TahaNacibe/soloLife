@@ -8,10 +8,13 @@ class Profile {
   String rank;
   String job;
   int voltage;
+  int coins;
+  String framePath;
   bool haveMessage;
   List<dynamic>? oldJobs;
   List<dynamic>? keys;
   List<dynamic> counter;
+  List<dynamic> inventory;
 
    Profile({
     required this.userName,
@@ -23,7 +26,10 @@ class Profile {
     this.voltage = 0,
     this.job = "Empty",
     this.haveMessage = true,
+    this.coins = 0,
     this.keys,
+    this.framePath = "",
+    this.inventory = const [],
     this.counter = const [
           {'Healer':0},{'Ranger':0},{'Assassin':0},
           {'Tanker':0},{'Fighter':0},{'Mage':0},
@@ -42,7 +48,10 @@ class Profile {
     List<dynamic>? oldJobs,
     int? voltage,
     bool? haveMessage,
-    List<dynamic>? counter
+    int? coins,
+    String? framePath,
+    List<dynamic>? counter,
+    List<dynamic>? inventory
   }) =>
       Profile(
         userName: userName ?? this.userName,
@@ -54,8 +63,11 @@ class Profile {
         keys: keys ?? this.keys,
         oldJobs: oldJobs ?? this.oldJobs,
         voltage: voltage ?? this.voltage,
+        coins: coins ?? this.coins,
         haveMessage: haveMessage ?? this.haveMessage,
-        counter:counter ?? this.counter
+        counter:counter ?? this.counter,
+        framePath: framePath ?? this.framePath,
+        inventory: inventory ?? this.inventory
       );
 
   factory Profile.fromJson(Map<String, dynamic> json) => Profile(
@@ -68,6 +80,9 @@ class Profile {
         keys: json['keys'],
         oldJobs: json['oldJobs'] ?? [],
         voltage: json['voltage'] ?? 0,
+        coins: json["coins"] ?? 0,
+        framePath: json["framePath"] ?? "",
+        inventory: json['inventory'] ?? [],
         haveMessage: json['haveMessage'] ?? true,
         counter: json['counter'] ?? [
           {'Healer':0},{'Ranger':0},{'Assassin':0},
@@ -86,8 +101,11 @@ class Profile {
         'voltage':voltage,
         'oldJobs':oldJobs,
         'haveMessage':haveMessage,
-        'counter':counter
+        'counter':counter,
+        'framePath': framePath,
+        'coins': coins,
+        'inventory': inventory
       };
 
-  List<Object?> get props => [userName, level, exp,rank];
+  List<Object?> get props => [userName, level, exp,rank,coins];
 }

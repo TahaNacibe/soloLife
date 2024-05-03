@@ -138,11 +138,11 @@ void soloProtocol(){
     ProfileProvider().saveProfile(userInfo,"");
     String time = DateTime.now().toIso8601String();
     List<Daily> startUp = [
-    Daily(title:"Push-Ups  [100]" , exp: getExpForTheTasks(userInfo.level,false),standard: true,timeStamp:time),
-    Daily(title:"Set-Ups  [100]" , exp: getExpForTheTasks(userInfo.level,false),standard: true,timeStamp:time),
-    Daily(title:"Pull-Ups  [100]" , exp: getExpForTheTasks(userInfo.level,false),standard: true,timeStamp:time),
-    Daily(title:"Squats  [100]" , exp: getExpForTheTasks(userInfo.level,false),standard: true,timeStamp:time),
-    Daily(title:"Running  [10Km]" , exp: getExpForTheTasks(userInfo.level,false),standard: true,timeStamp:time),
+    Daily(title:"Push-Ups  [100]" , exp: getExpForTheTasks(userInfo.level,false),standard: true,timeStamp:time, coins: getCoinsForTheTasks(false)),
+    Daily(title:"Set-Ups  [100]" , exp: getExpForTheTasks(userInfo.level,false),standard: true,timeStamp:time, coins: getCoinsForTheTasks(false)),
+    Daily(title:"Pull-Ups  [100]" , exp: getExpForTheTasks(userInfo.level,false),standard: true,timeStamp:time, coins: getCoinsForTheTasks(false)),
+    Daily(title:"Squats  [100]" , exp: getExpForTheTasks(userInfo.level,false),standard: true,timeStamp:time, coins: getCoinsForTheTasks(false)),
+    Daily(title:"Running  [10Km]" , exp: getExpForTheTasks(userInfo.level,false),standard: true,timeStamp:time, coins: getCoinsForTheTasks(false)),
     ];
     DailyTasks().writeTasks(startUp);
 }
@@ -155,6 +155,7 @@ void dreamProtocol(){
       title: "Dream Space",
       icon: personIcon,
       color: Colors.red.toHex(),
+      
     );
     tasks.add(task);
    TaskProvider().writeTasks(tasks);

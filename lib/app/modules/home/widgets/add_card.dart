@@ -2,6 +2,7 @@ import 'package:SoloLife/app/core/utils/Keys.dart';
 import 'package:SoloLife/app/core/utils/extensions.dart';
 import 'package:SoloLife/app/core/values/colors.dart';
 import 'package:SoloLife/app/data/models/task.dart';
+import 'package:SoloLife/app/data/services/expScal/exp.dart';
 import 'package:SoloLife/app/modules/home/controller.dart';
 import 'package:SoloLife/app/widgets/icons.dart';
 import 'package:dotted_border/dotted_border.dart';
@@ -11,15 +12,15 @@ import 'package:get/get.dart';
 
 class AddCard extends StatelessWidget {
   final homeCtrl = Get.find<HomeController>();
-  AddCard({super.key});
+  final void Function() change;
+  AddCard({super.key, required this.change});
 
   @override
   Widget build(BuildContext context) {
     final icons = getIcons();
-    var squareWidth = Get.width - 12.0.wp;
     return Container(
-      width: squareWidth / 2,
-      height: squareWidth / 2,
+      //width: squareWidth / 2,
+      //height: squareWidth / 2,
       margin: EdgeInsets.all(3.0.wp),
       decoration: BoxDecoration(
         color: Theme.of(context).cardColor,
@@ -28,6 +29,7 @@ class AddCard extends StatelessWidget {
         onLongPress:(){
           Navigator.popAndPushNamed(context, "commandPage");
         },
+        onDoubleTap:change,
         onTap: () async {
           await Get.defaultDialog(
               titlePadding: EdgeInsets.symmetric(vertical: 5.0.wp),
