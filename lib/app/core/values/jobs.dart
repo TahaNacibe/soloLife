@@ -36,10 +36,8 @@ String weightedRandomSelection(List<Map<String, dynamic>> items) {
 void updateClass(String job){
   // get user data as var user
     final Profile user = ProfileProvider().readProfile();
-    print("===============${user.level}");
     user.job = job;
    ProfileProvider().saveProfile(user, "");
-   print("===============${ProfileProvider().readProfile().level}");
 
 }
 
