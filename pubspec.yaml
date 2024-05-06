@@ -57,6 +57,8 @@ dependencies:
   inner_glow: ^1.0.0
   material_dialogs: ^1.1.4
   progress_border: ^0.1.5
+  fl_chart: ^0.67.0
+  easy_pie_chart: ^1.0.0
 
 dev_dependencies:
 icons_launcher:
@@ -93,6 +95,10 @@ flutter:
   assets:
     - assets/images/
     - assets/images/frames/
+    - assets/images/items/full/
+    - assets/images/items/box/
+    - assets/images/items/medium/
+    - assets/images/items/small/
   #   - images/a_dot_ham.jpeg
 
   # An image asset can refer to one or more resolution-specific "variants", see

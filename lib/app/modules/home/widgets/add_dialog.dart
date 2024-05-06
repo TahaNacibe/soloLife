@@ -10,6 +10,7 @@ class AddDialog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    bool isFree = false;
     return WillPopScope(
       onWillPop: () async => false,
       child: Scaffold(
@@ -40,7 +41,7 @@ class AddDialog extends StatelessWidget {
                             EasyLoading.showError('Please select task type');
                           } else {
                            var success =
-                              homeCtrl.addTodo(homeCtrl.editCtrl.text);
+                              homeCtrl.addTodo(homeCtrl.editCtrl.text,isFree);
                           if (success) {
                              homeCtrl.updateTodos();
                       homeCtrl.changeTask(null);

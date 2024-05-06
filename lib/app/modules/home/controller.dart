@@ -98,9 +98,9 @@ class HomeController extends GetxController {
     return todos.any((element) => element['title'] == title);
   }
 //? add new sub task 'toDo' to parent Task
-  bool addTodo(String title,) {
+  bool addTodo(String title,bool state) {
     bool isFree = false;
-      if (title.contains("--free")) {
+      if (title.contains("--free") || state) {
       title = title.replaceAll("--free", "");
       isFree = true;
   }

@@ -5,6 +5,8 @@ class ShopItem {
   String itemType;
   bool isOwned;
   String id;
+  int rarity;
+  String description;
 
    ShopItem({
     required this.title,
@@ -13,5 +15,7 @@ class ShopItem {
     required this.itemType,
     required this.id,
     this.isOwned = false,
+    required this.rarity,
+    this.description = "no Description for that item"
   });
 }

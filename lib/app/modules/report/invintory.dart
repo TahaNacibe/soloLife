@@ -172,7 +172,7 @@ void dialogBox(String name, String id, String image){
 
   void bottomShit(String BoxType, String image, void Function() refresh,String id){
     String selectedItem = "";
-    ShopItem selectedItemRow = ShopItem(title: "Item", image: "image", price: 0, itemType: "", id: "id");
+    ShopItem selectedItemRow = ShopItem(title: "Item", image: "image", price: 0, itemType: "", id: "id",rarity: 3);
      showModalBottomSheet(
               context: context,
               builder: (BuildContext context) {

@@ -16,18 +16,10 @@ class AchievementsPage extends StatefulWidget {
 }
 
 class _AchievementsPageState extends State<AchievementsPage> {
-   List<Map<String,dynamic>> jobFilter = [
-  {'name':'Healer','Icon':IconPack.health, "color":Colors.blue, 'text':'mana 25 vitality 25'},
-  {'name':'Ranger','Icon':IconPack.crossbow, "color":Colors.teal,'text':'agility 35 sense 10'},
-  {'name':'Assassin','Icon':IconPack.bone_knife, "color":const Color.fromARGB(255, 65, 33, 243),'text':'sense 20 agility 30'},
-  {'name':'Tanker','Icon':IconPack.shield, "color":Colors.orange,'text':'vitality 35 agility 10'},
-  {'name':'Fighter','Icon':IconPack.fist_raised, "color":Colors.red,'text':'strength 25 vitality 25'},
-  {'name':'Mage','Icon':IconPack.crystal_wand, "color":Colors.green,'text':'mana 20 intelligence 30'},
-  {'name':'Necromancer','Icon':IconPack.skull, "color":Colors.purple,'text':'mana 30 intelligence 25 agility 10 vitality 10'}];
 
   @override
   Widget build(BuildContext context) {
-    List jobs = userInfo.oldJobs!;
+    
     UserState states = StatesProvider().readState();
     return Scaffold(
       appBar: AppBar(),
@@ -36,30 +28,7 @@ class _AchievementsPageState extends State<AchievementsPage> {
                   width: 120,
                   height: 120,
                   "assets/images/trophy.png"),
-                                        Padding(
-              padding: const EdgeInsets.all(12),
-              child: Text("Unlocked Classes :",
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,fontFamily: "Quick"),),
-            ),
-            Padding(
-              padding: const EdgeInsets.all(12),
-              child: GridView.builder(
-                physics: NeverScrollableScrollPhysics(),
-                shrinkWrap: true,
-                itemCount: jobFilter.length,
-                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisSpacing: 10,
-                mainAxisExtent: 50,
-                mainAxisSpacing: 10,
-                  crossAxisCount: 2), 
-                  itemBuilder: (context,index){
-                    bool isOpen = jobs.contains(jobFilter[index]['name']);
-                    return item(jobFilter[index]['name'], isOpen, 
-                    jobFilter[index]['Icon'], context,jobFilter[index]['color'],jobFilter[index]['text']);
-                  }),
-            ),
+                                       
         Padding(
               padding: const EdgeInsets.all(12),
               child: Text("Titles :",
@@ -118,55 +87,3 @@ class _AchievementsPageState extends State<AchievementsPage> {
   }
 }
 
-Widget item(String title,bool isOpen,IconData icon,BuildContext context,Color color,String text){
-  return GestureDetector(
-    onTap:(){
-         final snackBar = SnackBar(
-        duration: Duration(seconds: 2),
-      backgroundColor:color,
-      content: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Expanded(
-            child: Text("Title bonce: $text",
-            softWrap: true,
-            style: TextStyle(
-              color: Theme.of(context).iconTheme.color,
-                fontWeight: FontWeight.bold,
-                fontFamily: "Quick",
-                )),
-          ),
-              Icon(icon)
-        ],
-      ));
-    ScaffoldMessenger.of(context).showSnackBar(snackBar);
-    },
-    child: Stack(
-      children: [
-        Container(
-              padding: EdgeInsets.all(8),
-              decoration: BoxDecoration(
-                border: Border.all(color:color),
-                borderRadius: BorderRadius.circular(30)
-              ),
-          child: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text("$title",
-              style: TextStyle(
-                color:color,
-                fontSize: 16,
-                fontFamily: "Quick",
-                fontWeight: FontWeight.bold),
-                ),
-          Align(alignment: Alignment.centerRight,
-            child: Container(
-              color:isOpen? Colors.transparent : Theme.of(context).cardColor.withOpacity(.4),
-              child: Icon(isOpen? icon : Icons.lock,color: color,),),
-          )
-            ],
-          ),
-        ),
-      ],
-    ),
-  );
-}

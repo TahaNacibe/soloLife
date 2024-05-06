@@ -1,6 +1,7 @@
 import 'dart:math';
 import 'dart:ui';
 
+import 'package:SoloLife/app/core/utils/icon_pack_icons.dart';
 import 'package:SoloLife/app/data/models/profile.dart';
 import 'package:SoloLife/app/data/models/state.dart';
 import 'package:SoloLife/app/data/providers/task/provider.dart';
@@ -180,3 +181,12 @@ String convertToRomanNumeral(int number) {
 Color colorGater(int counterNumber){
   return counterNumber >= 20? Colors.purple : counterNumber >=15? Colors.red: counterNumber >= 10? Colors.indigo: counterNumber >= 5? Colors.teal :counterNumber < 5? Colors.blue: Colors.blue;
 }
+
+   List<Map<String,dynamic>> jobList = [
+  {'name':'Healer','Icon':IconPack.health, "color":Colors.blue, 'text':'mana 25 vitality 25'},
+  {'name':'Ranger','Icon':IconPack.crossbow, "color":Colors.teal,'text':'agility 35 sense 10'},
+  {'name':'Assassin','Icon':IconPack.bone_knife, "color":const Color.fromARGB(255, 65, 33, 243),'text':'sense 20 agility 30'},
+  {'name':'Tanker','Icon':IconPack.shield, "color":Colors.orange,'text':'vitality 35 agility 10'},
+  {'name':'Fighter','Icon':IconPack.fist_raised, "color":Colors.red,'text':'strength 25 vitality 25'},
+  {'name':'Mage','Icon':IconPack.crystal_wand, "color":Colors.green,'text':'mana 20 intelligence 30'},
+  {'name':'Necromancer','Icon':IconPack.skull, "color":Colors.purple,'text':'mana 30 intelligence 25 agility 10 vitality 10'}];

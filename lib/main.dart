@@ -1,4 +1,3 @@
-
 import 'package:SoloLife/app/core/values/light_theme.dart';
 import 'package:SoloLife/app/data/providers/task/provider.dart';
 import 'package:SoloLife/app/data/services/voiseServices.dart';

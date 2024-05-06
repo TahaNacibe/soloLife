@@ -40,6 +40,7 @@ class HomePage extends GetView<HomeController> {
         children: [
           Stack(
             children: [
+              
               Stack(
                 alignment: Alignment.topRight,
                 children: [
@@ -51,146 +52,148 @@ class HomePage extends GetView<HomeController> {
                       child: Row(children: [
                         Padding(
                           padding: const EdgeInsets.all(8.0),
-                          child: Icon(Icons.backpack,color: Colors.white,size:25),
+                          child: GestureDetector(
+                            onTap:(){
+                              Navigator.pushNamed(context, "Inventory");
+                            },
+                            child: Icon(Icons.backpack,color: Colors.white,size:25)),
                         ),
                         Icon(Icons.settings,color:Colors.white,size: 25,)],),
                     ),
                   )
                 ],
               ),
-              SafeArea(
-                child: StatefulBuilder(
-                  builder: (context,setState) {
-                    return ListView(
-                      children: [
-                       
-                        Stack(
-                          children: [
+              StatefulBuilder(
+                builder: (context,setState) {
+                  return ListView(
+                    children: [
+                     
+                      Stack(
+                        children: [
+                        
                           
-                            
-                            Stack(
+                          Stack(
+                            children: [
+                              Container(
+                              margin: EdgeInsets.only(top: 120),
+                                decoration: BoxDecoration(
+                                borderRadius: BorderRadius.vertical(top:Radius.circular(25)),
+                                color: Theme.of(context).cardColor,
+                              ),
+                                child: UserInfoCard()),
+                                
+                            ],
+                          ),
+                        ],
+                      ),
+                      Container(color: Theme.of(context).cardColor,
+                      
+                        child: Column(
+                          children: [
+                            if(userInfo.keys!.isNotEmpty)
+                            Column(
                               children: [
-                                Container(
-                                margin: EdgeInsets.only(top: 120),
-                                  decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.vertical(top:Radius.circular(25)),
-                                  color: Theme.of(context).cardColor,
-                                ),
-                                  child: UserInfoCard()),
+                              Stack(alignment: Alignment.centerLeft,
+                                children: [
+                                  Divider(),
+                                  Container(
+                                    padding: EdgeInsets.symmetric(horizontal: 18),
+                                    color: Theme.of(context).cardColor,
+                                    child: Text(
+                                    "Tools",
+                                    style: TextStyle(
+                                    fontFamily:"Quick",
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.bold),),
+                                  ),
+                                ],
+                              ),
+                                GridView.count(
+                                    childAspectRatio :isBox? 1 : 3.5,
+                                    crossAxisCount: count,
+                                    shrinkWrap: true,
+                                    physics: const ClampingScrollPhysics(),
+                                    children: [
+                                      if(authority.contains('solo'))
+                                          DailyCard(isBox: isBox,),
+                                          if(authority.contains('manager'))
+                                          ManagerCard(isBox:isBox,),
+                                          if(authority.contains('voltage'))
+                                          VoltageCard(isBox: isBox,),
+                                    ],
                                   
+                                ),
+                              ],
+                            ),
+                            Column(
+                              children: [
+                                Stack(alignment: Alignment.centerLeft,
+                                children: [
+                                  Divider(),
+                                  Container(
+                                    padding: EdgeInsets.symmetric(horizontal: 18),
+                                    color: Theme.of(context).cardColor,
+                                    child: Text(
+                                    "Collections",
+                                    style: TextStyle(
+                                    fontFamily:"Quick",
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.bold),),
+                                  ),
+                                ],
+                              ),
+                                Obx(
+                                  () => GridView.count(
+                                    
+                                    childAspectRatio :isBox? 1 : 3.5,
+                                    crossAxisCount: count,
+                                    shrinkWrap: true,
+                                    physics: const ClampingScrollPhysics(),
+                                    children: [
+                                      
+                                      if(!userInfo.keys!.contains('wail'))
+                                      AddCard(change:(){
+                                        count == 1? count = 2 : count = 1;
+                                        isBox = !isBox;
+                                        isBox? userInfo.keys!.remove("list") :userInfo.keys!.add("list");
+                                        ProfileProvider().saveProfile(userInfo,"");
+                                        setState((){});
+                                      },),
+                                      ...controller.tasks
+                                          .map((element) => !(element.title == "Dream Space")? LongPressDraggable(
+                                              data: element,
+                                              onDragStarted: () =>
+                                                  controller.changeDeleting(true),
+                                              onDraggableCanceled: (_, __) =>
+                                                  controller.changeDeleting(false),
+                                              onDragEnd: (_) =>
+                                                  controller.changeDeleting(false),
+                                              feedback: Opacity(
+                                                opacity: 0.8,
+                                                child: TaskCard(task: element, isBox:isBox,),
+                                              ),
+                                              child: TaskCard(task: element,isBox:isBox,)): DreamCard(task:element,isBox: isBox,),)
+                                          .toList(),
+                                          if(userInfo.keys!.contains('wail'))
+                                      AddCard(change:(){
+                                        count == 1? count = 2 : count = 1;
+                                        isBox = !isBox;
+                                         isBox? userInfo.keys!.remove("list") :userInfo.keys!.add("list");
+                                        ProfileProvider().saveProfile(userInfo,"");
+                                        setState((){});
+                                      },),
+                                          
+                                    ],
+                                  ),
+                                ),
                               ],
                             ),
                           ],
                         ),
-                        Container(color: Theme.of(context).cardColor,
-                        
-                          child: Column(
-                            children: [
-                              if(userInfo.keys!.isNotEmpty)
-                              Column(
-                                children: [
-                                Stack(alignment: Alignment.centerLeft,
-                                  children: [
-                                    Divider(),
-                                    Container(
-                                      padding: EdgeInsets.symmetric(horizontal: 18),
-                                      color: Theme.of(context).cardColor,
-                                      child: Text(
-                                      "Tools",
-                                      style: TextStyle(
-                                      fontFamily:"Quick",
-                                      fontSize: 20,
-                                      fontWeight: FontWeight.bold),),
-                                    ),
-                                  ],
-                                ),
-                                  GridView.count(
-                                      childAspectRatio :isBox? 1 : 3.5,
-                                      crossAxisCount: count,
-                                      shrinkWrap: true,
-                                      physics: const ClampingScrollPhysics(),
-                                      children: [
-                                        if(authority.contains('solo'))
-                                            DailyCard(isBox: isBox,),
-                                            if(authority.contains('manager'))
-                                            ManagerCard(isBox:isBox,),
-                                            if(authority.contains('voltage'))
-                                            VoltageCard(isBox: isBox,),
-                                      ],
-                                    
-                                  ),
-                                ],
-                              ),
-                              Column(
-                                children: [
-                                  Stack(alignment: Alignment.centerLeft,
-                                  children: [
-                                    Divider(),
-                                    Container(
-                                      padding: EdgeInsets.symmetric(horizontal: 18),
-                                      color: Theme.of(context).cardColor,
-                                      child: Text(
-                                      "Collections",
-                                      style: TextStyle(
-                                      fontFamily:"Quick",
-                                      fontSize: 20,
-                                      fontWeight: FontWeight.bold),),
-                                    ),
-                                  ],
-                                ),
-                                  Obx(
-                                    () => GridView.count(
-                                      
-                                      childAspectRatio :isBox? 1 : 3.5,
-                                      crossAxisCount: count,
-                                      shrinkWrap: true,
-                                      physics: const ClampingScrollPhysics(),
-                                      children: [
-                                        
-                                        if(!userInfo.keys!.contains('wail'))
-                                        AddCard(change:(){
-                                          count == 1? count = 2 : count = 1;
-                                          isBox = !isBox;
-                                          isBox? userInfo.keys!.remove("list") :userInfo.keys!.add("list");
-                                          ProfileProvider().saveProfile(userInfo,"");
-                                          setState((){});
-                                        },),
-                                        ...controller.tasks
-                                            .map((element) => !(element.title == "Dream Space")? LongPressDraggable(
-                                                data: element,
-                                                onDragStarted: () =>
-                                                    controller.changeDeleting(true),
-                                                onDraggableCanceled: (_, __) =>
-                                                    controller.changeDeleting(false),
-                                                onDragEnd: (_) =>
-                                                    controller.changeDeleting(false),
-                                                feedback: Opacity(
-                                                  opacity: 0.8,
-                                                  child: TaskCard(task: element, isBox:isBox,),
-                                                ),
-                                                child: TaskCard(task: element,isBox:isBox,)): DreamCard(task:element,isBox: isBox,),)
-                                            .toList(),
-                                            if(userInfo.keys!.contains('wail'))
-                                        AddCard(change:(){
-                                          count == 1? count = 2 : count = 1;
-                                          isBox = !isBox;
-                                           isBox? userInfo.keys!.remove("list") :userInfo.keys!.add("list");
-                                          ProfileProvider().saveProfile(userInfo,"");
-                                          setState((){});
-                                        },),
-                                            
-                                      ],
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ],
-                          ),
-                        )
-                      ],
-                    );
-                  }
-                ),
+                      )
+                    ],
+                  );
+                }
               ),
             ],
           ),
