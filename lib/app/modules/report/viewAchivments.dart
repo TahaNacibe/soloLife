@@ -1,12 +1,10 @@
-
 import 'package:SoloLife/app/core/utils/icon_pack_icons.dart';
-import 'package:SoloLife/app/data/models/state.dart';
+import 'package:SoloLife/app/data/models/achivments.dart';
+import 'package:SoloLife/app/data/models/profile.dart';
 import 'package:SoloLife/app/data/providers/task/provider.dart';
-import 'package:SoloLife/app/data/services/voiceCommand/service.dart';
-import 'package:SoloLife/app/modules/report/viewRepot.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
+import 'package:step_progress_indicator/step_progress_indicator.dart';
 
 class AchievementsPage extends StatefulWidget {
   const AchievementsPage({super.key});
@@ -16,74 +14,189 @@ class AchievementsPage extends StatefulWidget {
 }
 
 class _AchievementsPageState extends State<AchievementsPage> {
-
+  Profile user = ProfileProvider().readProfile();
   @override
   Widget build(BuildContext context) {
-    
-    UserState states = StatesProvider().readState();
+  List<dynamic> yourAchievements = user.achievements;
+  List<dynamic> achievements = achievementsArchive.values.toList();
+  int percent = (yourAchievements.length*100)~/achievements.length;
     return Scaffold(
-      appBar: AppBar(),
-      body:ListView(children: [
-        Image.asset(
-                  width: 120,
-                  height: 120,
-                  "assets/images/trophy.png"),
-                                       
-        Padding(
-              padding: const EdgeInsets.all(12),
-              child: Text("Titles :",
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,fontFamily: "Quick"),),
-            ),
-            //Todo change to grid view builder
+      appBar: AppBar(
+        title: Text("Achievements",style: TextStyle(fontFamily: "Quick",fontWeight: FontWeight.w600),),
+      ),
+      body:SingleChildScrollView(
+        child: Column(
+          children: [
+            septateLine("Statics"),
             Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: GridView(
-                shrinkWrap: true,
-                physics: NeverScrollableScrollPhysics(),
-                gridDelegate: 
-              SliverGridDelegateWithFixedCrossAxisCount(
-               // childAspectRatio: 0.5,
-                crossAxisSpacing: 8,
-                mainAxisExtent: 50,
-                mainAxisSpacing: 8,
-                crossAxisCount: 2),
-              children: [
-                //basic titles 
-                Text("basic titles",style: TextStyle(fontFamily: "Quick",fontWeight: FontWeight.bold,fontSize: 18),),
-                Divider(),
-                titleBar("Born Of a Mage", states.mana, 75, Colors.blue, context, "Mana"),
-                titleBar("The Basis of Sense", states.sense, 75, Colors.blue, context, "Sense"),
-                titleBar("The Core of Life", states.vitality, 75, Colors.blue, context, "Vitality"),
-                titleBar("Foundation of Power", states.strength, 75, Colors.blue, context, "Strength"),
-                titleBar("Basis of Mind", states.intelligence, 75, const Color.fromARGB(255, 75, 162, 233), context, "Intelligence"),
-                titleBar("beginning of Agility", states.agility, 75, Colors.blue, context, "Agility"),
-                //advance titles
-                Text("advance titles",style: TextStyle(fontFamily: "Quick",fontWeight: FontWeight.bold,fontSize: 18),),
-                Divider(),
-                titleBar("The Great Mage", states.mana, 200, Colors.red, context, "Mana"),
-                titleBar("The rule of Perception", states.sense, 200, Colors.red, context, "Sense"),
-                titleBar("Into immortality", states.vitality, 200, Colors.red, context, "Vitality"),
-                titleBar("Body Of Steal", states.strength, 200, Colors.red, context, "Strength"),
-                titleBar("Master of Mind", states.intelligence, 200, Colors.red, context, "Intelligence"),
-                titleBar("Protector of Agility", states.agility, 200, Colors.red, context, "Agility"),
-                //master titles
-                Text("master titles",style: TextStyle(fontFamily: "Quick",fontWeight: FontWeight.bold,fontSize: 18),),
-                Divider(),
-                titleBar("The anchor of Mana", states.mana, 1000, Colors.purple, context, "Mana"),
-                titleBar("The anchor of Sense", states.sense, 1000, Colors.purple, context, "Sense"),
-                titleBar("The anchor of Strength", states.strength, 1000, Colors.purple, context, "Strength"),
-                titleBar("The anchor of Intelligence", states.intelligence, 1000, Colors.purple, context, "Intelligence"),
-                titleBar("The anchor of Vitality", states.vitality, 1000, Colors.purple, context, "Vitality"),
-                titleBar("The anchor of Agility", states.agility, 1000, Colors.purple, context, "Agility"),
-                Text("monarch titles",style: TextStyle(fontFamily: "Quick",fontWeight: FontWeight.bold,fontSize: 18),),
-                Divider(),
-                titleBarMax("The Origin of World", states, Colors.teal, context),
+              padding: const EdgeInsets.symmetric(horizontal: 16,vertical: 8),
+              child: Container(padding: EdgeInsets.all(12),
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(12),
+                                color: Theme.of(context).cardColor,
+                                boxShadow:[BoxShadow(
+                                color: Theme.of(context).shadowColor, // Shadow color
+                                spreadRadius: 1, // Extends the shadow beyond the box
+                                blurRadius: 5, // Blurs the edges of the shadow
+                                offset: const Offset(0, 3), // Moves the shadow slightly down and right
+                                )]
+                              ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                  // the open achievement count widget
+                  CircularStepProgressIndicator(
+                    totalSteps:achievements.length,
+                            currentStep: yourAchievements.length,
+                            stepSize: 8,
+                            selectedColor: Colors.indigo,
+                            unselectedColor: Colors.blueGrey.withOpacity(.1),
+                            padding: 0,
+                            width: 100,
+                            height: 100,
+                            selectedStepSize: 15,
+                            roundedCap: (_, __) => true,
+                            child: Center(child: Text("$percent%",
+                            style: TextStyle(
+                              fontFamily: "Quick",
+                              fontWeight: FontWeight.bold,
+                              fontSize: 20
+                            ),)),
+                  ),
+                  // the states here
+                  Text.rich(
+                    textAlign: TextAlign.center,
+                    style: TextStyle(fontFamily: "Quick",fontWeight: FontWeight.bold,fontSize: 16),
+                    TextSpan(children: [
+                    TextSpan(text:"${yourAchievements.length}\n",
+                    style: TextStyle(
+                      color:Colors.indigo
+                    )),
+                    TextSpan(text: "Unlocked")
+                  ])),
+                  Text.rich(
+                    textAlign: TextAlign.center,
+                    style: TextStyle(fontFamily: "Quick",fontWeight: FontWeight.bold,fontSize: 16),
+                    TextSpan(children: [
+                    TextSpan(text:"${achievements.length}\n",
+                    style: TextStyle(
+                      color:Colors.indigo
+                    )),
+                    TextSpan(text: "Total"),
+                  ])),
+                  Padding(
+                    padding: const EdgeInsets.only(right:8),
+                    child: Text.rich(
+                      textAlign: TextAlign.center,
+                      style: TextStyle(fontFamily: "Quick",fontWeight: FontWeight.bold,fontSize: 16),
+                      TextSpan(children: [
+                      TextSpan(text:"${achievements.length - yourAchievements.length}\n",
+                      style: TextStyle(
+                        color:Colors.indigo
+                      )),
+                      TextSpan(text: "Locked"),
+                    ])),
+                  ),
                 ],),
-            )
-      ],),
+              ),
+            ),
+            septateLine("Achievement"),
+            ListView.builder(
+              physics: NeverScrollableScrollPhysics(),
+              shrinkWrap: true,
+              itemCount: achievements.length,
+              itemBuilder: (context,index){
+                Achievements item = achievements[index]!;
+                bool isOpen = yourAchievements.contains(item.id);
+                bool isHidden = item.isHidden;
+                if(isHidden && !isOpen){
+                  return Container();
+                }else{
+                return achievementItem(
+                  item.title,
+                  item.rarity,
+                  item.description,
+                  isOpen
+                );
+                }
+              }),
+          ],
+        ),
+      ),
     );
+  }
+
+  Widget achievementItem(String title,int rarity,String description,bool isOpen){
+  String prize = rarity == 7? "15K" : rarity == 6? "5k" : rarity == 5? "1k": rarity == 4?  "500":"250";
+  Color color = rarity == 7? Colors.purple : rarity == 6? Colors.red: rarity ==5? Colors.orange:rarity == 4? Colors.blue: Colors.brown;
+    description = isOpen && rarity == 7? "Surpass all the limits" : description;
+    return Stack(
+      children: [
+        Padding(
+          padding: const EdgeInsets.all(6),
+          child: Container(padding: EdgeInsets.all(12),
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(12),
+                                color: Theme.of(context).cardColor,
+                                boxShadow:[BoxShadow(
+                                color: Theme.of(context).shadowColor, // Shadow color
+                                spreadRadius: 1, // Extends the shadow beyond the box
+                                blurRadius: 5, // Blurs the edges of the shadow
+                                offset: const Offset(0, 3), // Moves the shadow slightly down and right
+                                )]
+                              ),
+            child: ListTile(
+              title: Text(isOpen? title : "????",
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                fontFamily: "Quick"),),
+              subtitle: Text(description,style: TextStyle(
+                fontWeight: FontWeight.w500,
+                fontFamily: "Quick"),),
+              trailing: SizedBox(
+                width: 40,
+                height:40,
+                child:isOpen? Row(
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.all(2),
+                      child: Icon(Icons.star,color: color,),
+                    ),
+                    Text("$rarity",style: TextStyle(
+                      color: color,
+                      fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  fontFamily: "Quick")),
+                  ],
+                ): Icon(Icons.lock,color:color)
+              ),
+              leading: Icon(IconPack.trophy,color: color,size: 50,),
+            )
+          ),
+        ),
+        if(!isOpen)
+        Positioned.fill(
+          child: Container(      
+            color:Theme.of(context).cardColor.withOpacity(.6),
+          ),
+        )
+      ],
+    );
+  }
+  Widget septateLine(String title){
+    return Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 12),
+          child: Stack(alignment: Alignment.centerLeft,
+            children: [
+              //color: Theme.of(context).iconTheme.color!.withOpacity(.5),
+              Divider(),
+              Container(
+                padding: EdgeInsets.all(8),
+                color: Theme.of(context).cardColor,
+                child: Text(title,style: TextStyle(fontFamily: "Quick", fontWeight: FontWeight.w700,fontSize: 18),)),
+            ],
+          ),
+                );
   }
 }
 

@@ -1,11 +1,15 @@
 import 'dart:async';
 import 'dart:io';
+import 'package:SoloLife/annoncment/levelUp.dart';
 import 'package:SoloLife/app/core/utils/icon_pack_icons.dart';
 import 'package:SoloLife/app/core/values/jobs.dart';
+import 'package:SoloLife/app/data/models/achivments.dart';
 import 'package:SoloLife/app/data/models/profile.dart';
 import 'package:SoloLife/app/data/models/state.dart';
 import 'package:SoloLife/app/data/providers/task/provider.dart';
 import 'package:SoloLife/app/data/services/expScal/exp.dart';
+import 'package:SoloLife/app/settings/profileImagePlus.dart';
+import 'package:SoloLife/app/settings/profile_edit.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
@@ -14,6 +18,7 @@ import 'package:material_dialogs/dialogs.dart';
 import 'package:material_dialogs/shared/types.dart';
 import 'package:material_dialogs/widgets/buttons/icon_outline_button.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:provider/provider.dart';
 import 'package:step_progress_indicator/step_progress_indicator.dart';
 
 class UserInfoCard extends StatefulWidget {
@@ -25,32 +30,45 @@ class UserInfoCard extends StatefulWidget {
 
 class _UserInfoCardState extends State<UserInfoCard> {
   late File _imageFile;
+  File? _profileImage;
+  late File coverPath;
   bool isThere = false;
+  bool isThereCover = false;
   bool theme = false;
   @override
   void initState() {
      theme = ThemeProvider().loadTheme();
+     DailyService().scheduleTaskReset(context);
     super.initState();
-    _loadImage();
+    _loadImages();
   }
   
-  Future<void> _loadImage() async {
-    final Directory appDirectory = await getApplicationDocumentsDirectory();
-    final String filePath = '${appDirectory.path}/profile_image.png';
+  Future<void> _loadImages() async {
+  final directory = await getApplicationDocumentsDirectory();
+  final profileImagePath = '${directory.path}/pfp_image.png';
+  final coverImagePath = '${directory.path}/cover_image.png';
 
+  setState(() {
+    if (File(profileImagePath).existsSync()) {
+      _profileImage = File(profileImagePath);
+    }
+  });
+}
+      Future<void> _loadCover() async {
+    final Directory appDirectory = await getApplicationDocumentsDirectory();
+    final String filePath = '${appDirectory.path}/cover_image.png';
     if (await File(filePath).exists()) {
       setState(() {
-        _imageFile = File(filePath);
-        isThere = true;
+        coverPath = File(filePath);
+        isThereCover = true;
       });
     }else{
       setState(() {
-        _imageFile = File("");
-        isThere = false;
+        coverPath = File("");
+        isThereCover = false;
       });
     }
   }
-
 
   Future<void> _pickImage(ImageSource source) async {
     final pickedFile = await ImagePicker().pickImage(source: source);
@@ -68,13 +86,31 @@ class _UserInfoCardState extends State<UserInfoCard> {
     }
   }
 
+    Future<void> _pickImageCover(ImageSource source) async {
+    final pickedFile = await ImagePicker().pickImage(source: source);
+
+    if (pickedFile != null) {
+      final File imageFile = File(pickedFile.path);
+      final Directory appDirectory = await getApplicationDocumentsDirectory();
+      final String filePath = '${appDirectory.path}/cover_image.png';
+
+      await imageFile.copy(filePath);
+
+      setState(() {
+        _imageFile = File(filePath);
+      });
+    }
+  }
+
   bool isExpanded = false;
   bool hide = false;
       bool intOrNot = false;
 
   @override
   Widget build(BuildContext context) {
-    _loadImage();
+    _loadImages();
+    
+
     // get user data as var user
     final Profile user = ProfileProvider().readProfile();
     // get user level
@@ -166,8 +202,9 @@ Color getRankColor(String rank) {
     }
     void jobUpdate(){
       String selectedJob = weightedRandomSelection(jobs);
-      updateClass(selectedJob);
-      snack("New Class $selectedJob bones:${classReword(selectedJob)['message']}", false);
+      updateClass(selectedJob,context);
+      //snack("New Class $selectedJob bones:${classReword(selectedJob,context)['message']}", false);
+      achievementsHandler("job",context);
     }
 
     void dialogBox(){
@@ -218,17 +255,7 @@ Color getRankColor(String rank) {
           curve: Curves.easeInOut,
           height: isExpanded? 560 : 290,
           decoration:BoxDecoration(
-            
-            //border: Border.all(color: Colors.black.withOpacity(.2)),
-          //color: Theme.of(context).cardColor,
-          /*
-          boxShadow:[BoxShadow(
-          color: Theme.of(context).shadowColor, // Shadow color
-          spreadRadius: 1, // Extends the shadow beyond the box
-          blurRadius: 5, // Blurs the edges of the shadow
-          offset: const Offset(0, 3), // Moves the shadow slightly down and right
-          )]
-          */
+        
           ),
           child:  Padding(
             padding: const EdgeInsets.all(8.0),
@@ -242,34 +269,38 @@ Color getRankColor(String rank) {
                       children: [
                         GestureDetector(
                                       onTap:(){
-                                            _pickImage(ImageSource.gallery);
+                                            Navigator.popAndPushNamed(context, "ProfileInformation");
                                       },
-                          child: Stack(alignment: Alignment.bottomRight,
-                            children: [
-                              Padding(
-                                padding: const EdgeInsets.all(5),
-                                child: Container(
-                                
-                                decoration: BoxDecoration(
-                                  border: Border.all(
-                                    width: 5,
-                                    color:frame != ""? Colors.transparent :getRankColor(rank),),
-                                  shape: BoxShape.circle
-                                ),
-                                
-                                  child: CircleAvatar(
-                                            radius: 40,
-                                            backgroundImage: isThere 
-                                                ? FileImage(_imageFile)
-                                                : AssetImage('assets/images/giphy.gif') as ImageProvider,
-                                                 ),
-                                ),
-                              ),
-                               //? the Rank budget 
-                               if(frame != "")
-                            Image.asset(frame,width: 100, height:100,fit: BoxFit.cover, ),
-                                
-                            ],
+                          child: Consumer(
+            builder: (context, imageData, child) {
+                              return Stack(alignment: Alignment.bottomRight,
+                                children: [
+                                  Padding(
+                                    padding: const EdgeInsets.all(5),
+                                    child: Container(
+                                    
+                                    decoration: BoxDecoration(
+                                      border: Border.all(
+                                        width: 5,
+                                        color:frame != ""? Colors.transparent :getRankColor(rank),),
+                                      shape: BoxShape.circle
+                                    ),
+                                    
+                                      child: CircleAvatar(
+                                                radius: 40,
+                                                backgroundImage: _profileImage != null 
+                                                    ? FileImage(_profileImage!)
+                                                    : AssetImage('assets/images/giphy.gif') as ImageProvider,
+                                                     ),
+                                    ),
+                                  ),
+                                   //? the Rank budget 
+                                   if(frame != "")
+                                Image.asset(frame,width: 100, height:100,fit: BoxFit.cover, ),
+                                    
+                                ],
+                              );
+                            }
                           ),
                         ),
                         Padding(
@@ -305,8 +336,8 @@ Color getRankColor(String rank) {
                                   ),
                                 ])),
                                  Padding(
-                           padding: const EdgeInsets.all(6),
-                           child: Container(padding: const EdgeInsets.all(6),
+                                                            padding: const EdgeInsets.all(6),
+                                                            child: Container(padding: const EdgeInsets.all(6),
                                                           decoration:BoxDecoration(
                                                           color:const Color.fromARGB(255, 28, 39, 201).withOpacity(.7),
                                                           borderRadius: BorderRadius.circular(15)
@@ -315,7 +346,7 @@ Color getRankColor(String rank) {
                                                           style: const TextStyle(
                                                             fontWeight: FontWeight.bold,
                                                             fontSize: 16,color:Colors.white),)),
-                         ),
+                                                          ),
                             ],
                           ),
                              
@@ -351,10 +382,6 @@ Color getRankColor(String rank) {
                              ],
                            ),
                             
-                            /*Padding(
-                              padding: const EdgeInsets.only(bottom:6),
-                              child: Divider(color: Theme.of(context).iconTheme.color!.withOpacity(.1),),
-                            ),*/
                         ],
                       ),
                     ),
@@ -386,6 +413,7 @@ Color getRankColor(String rank) {
                                     },child: actionBarItem("Rank",rank,getRankColor(rank),false)),
                             GestureDetector(
                                                         onTap:(){
+                                                          
                                                           if(UserClass == "Empty" && level >= 5){
                                                             jobUpdate();
                                                           }else if(level < 5){
@@ -398,6 +426,9 @@ Color getRankColor(String rank) {
                                                             }
                                                             
                                                           }
+                                                          setState(() {
+                                                          });
+                                                          
                                                         },
                                                         onLongPressEnd:(_){
                                                           intOrNot = !intOrNot;
@@ -417,6 +448,7 @@ Color getRankColor(String rank) {
                         int time = !hide? 500 : 0;
                           isExpanded = !isExpanded;
                           setState((){});
+                        achievementsHandler('level',context);
                           Future.delayed(Duration(milliseconds: time)).then((_){
                             hide = !hide;
                             setState((){});
@@ -459,21 +491,6 @@ Color getRankColor(String rank) {
                         ),
                         child: Column(
                           children: [
-                            if(false)
-                            Padding(
-                              padding: const EdgeInsets.all(6),
-                              child: GridView.builder(
-                                shrinkWrap: true,
-                                itemCount: keys.length,
-                                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                                  crossAxisSpacing: 5,
-                                  mainAxisSpacing: 5,
-                                  childAspectRatio: 2,
-                                  crossAxisCount: 5), 
-                                itemBuilder: (context,index){
-                                  return authorityItems(keys[index]);
-                                }),
-                            ),
                             //? user points
                           if(hide)
                                     Padding(
@@ -504,8 +521,8 @@ Color getRankColor(String rank) {
                                                         child: GestureDetector(
                                                           onTap:(){
                                                             final snackBar = SnackBar(
-                                                              backgroundColor: rankManager()['change']? Colors.green : Colors.orange,
-                                                              content: Text("Rank Up :${rankManager()['rank']}",
+                                                              backgroundColor: rankManager(context)['change']? Colors.green : Colors.orange,
+                                                              content: Text("Rank Up :${rankManager(context)['rank']}",
                                                               style: TextStyle(
                                                             fontWeight: FontWeight.bold,
                                                             fontFamily: "Quick",
@@ -521,8 +538,6 @@ Color getRankColor(String rank) {
                                       ),
                                     ),
                                     
-                                     //Divider(color: Theme.of(context).iconTheme.color!.withOpacity(.4),),
-                                    // supposed to be !hide but for somehow that worked
                                     //? user states
                                     Padding(
                                       padding: const EdgeInsets.only(left:8),
@@ -549,14 +564,20 @@ Color getRankColor(String rank) {
                                   userStates("Agility",state.agility,(){
                                     state.agility = state.agility + 1;
                                     fastSave();
+                                    setState(() {});
+                                        achievementsHandler("state",context);
                                   },state),
                                   userStates("Intelligence",state.intelligence,(){
                                     state.intelligence = state.intelligence + 1;
                                     fastSave();
+                                    setState(() {});
+                                    achievementsHandler("state",context);
                                   },state),
                                   userStates("Sense",state.sense,(){
                                     state.sense = state.sense + 1;
                                     fastSave();
+                                    setState(() {});
+                                    achievementsHandler("state",context);
                                   },state),
                                 ],),
                             ),
@@ -567,14 +588,20 @@ Color getRankColor(String rank) {
                                   userStates("Strength",state.strength,(){
                                     state.strength = state.strength + 1;
                                     fastSave();
+                                    setState(() {});
+                                    achievementsHandler("state",context);
                                   },state),
                                   userStates("Vitality",state.vitality,(){
                                     state.vitality = state.vitality + 1;
                                     fastSave();
+                                    setState(() {});
+                                    achievementsHandler("state",context);
                                   },state),
                                   userStates("Mana",state.mana,(){
                                     state.mana = state.mana + 1;
                                     fastSave();
+                                    setState(() {});
+                                    achievementsHandler("state",context);
                                   },state),
                                 ],),
                               )
@@ -582,30 +609,8 @@ Color getRankColor(String rank) {
                         )
                           ],
                         ),
-                      ),
-                        
-                                 
-                        
+                      ),  
                   ],),
-                 /* //? the show more or less button
-                  Container(decoration: BoxDecoration(
-                    color: Theme.of(context).cardColor,
-                    shape: BoxShape.circle
-                  ),
-                    child: TextButton(onPressed: (){
-                      int time = !hide? 500 : 0;
-                          isExpanded = !isExpanded;
-                          setState((){});
-                          Future.delayed(Duration(milliseconds: time)).then((_){
-                            hide = !hide;
-                            setState((){});
-                          });
-                        }, child: Icon(
-                          !hide
-                          ? Icons.keyboard_double_arrow_down
-                          : Icons.keyboard_double_arrow_up,
-                          color: Theme.of(context).iconTheme.color,)),
-                  )*/
               ],
             ),
           ),),
@@ -770,83 +775,3 @@ IconData getClassIcon(String name){
     return icon;
   }
 }
-/*
-Row(
-                              children: [
-                                
-                                Stack(
-                                  children: [
-                                   GestureDetector(
-                                    onTap: (){
-                                      snack("Your Current Player Rank", false);
-                                    },
-                                     child: Container(padding: const EdgeInsets.all(8),
-                                                                            decoration:BoxDecoration(
-                                                                              borderRadius: BorderRadius.circular(15),
-                                                                            color:getRankColor(rank) ,
-                                                                            //shape: BoxShape.circle,
-                                                                            boxShadow:[BoxShadow(
-                                                    color: getRankColor(rank).withOpacity(.4), // Shadow color
-                                                    spreadRadius: 1, // Extends the shadow beyond the box
-                                                    blurRadius: 5, // Blurs the edges of the shadow
-                                                    offset: const Offset(0, 3), // Moves the shadow slightly down and right
-                                                    )]
-                                                                          ),
-                                                                            child: Text("Pr-$rank",
-                                                                            style: const TextStyle(
-                                                                              fontWeight: FontWeight.bold,
-                                                                              fontFamily: "Quick",
-                                                                              fontSize: 15,color:Colors.white),)),
-                                   ),
-                                  ],
-                                ),
-                                                      GestureDetector(
-                                                        onTap:(){
-                                                          if(UserClass == "Empty" && level >= 5){
-                                                            jobUpdate();
-                                                          }else if(level < 5){
-                                                            snack("Classes are available after level 5", true);
-                                                          }else if(UserClass != "empty"){
-                                                            if(state.points >= 40){
-                                                              dialogBox();
-                                                            }else{
-                                                              snack("required 40 point to change class", true);
-                                                            }
-                                                            
-                                                          }
-                                                        },
-                                                        onLongPressEnd:(_){
-                                                          intOrNot = !intOrNot;
-                                                          setState((){});
-                                                        },
-                                                        child: Stack(alignment: Alignment.centerRight,
-                                                          children: [
-                                                            Padding(
-                                                              padding: const EdgeInsets.symmetric(horizontal: 8,vertical: 4),
-                                                              child: Container(padding: const EdgeInsets.all(6),
-                                                              decoration:BoxDecoration(
-                                                              border: Border.all(
-                                                                width: 2,
-                                                                color: Colors.blue),
-                                                              borderRadius: BorderRadius.circular(15)
-                                                                                                                      ),
-                                                              child: Text.rich(TextSpan(
-                                                                children:[TextSpan(
-                                                                  text:  "$UserClass "
-                                                                ),
-                                                                TextSpan(
-                                                                  text:intOrNot? "$counterNumber": "${convertToRomanNumeral(counterNumber)}",
-                                                                  style: TextStyle(color:colorGater(counterNumber)   )
-                                                                )])
-                                                               ,
-                                                              style:  TextStyle(
-                                                              fontWeight: FontWeight.bold,
-                                                              fontSize: 16,color: Colors.blue),)),
-                                                            ),
-                                                                  
-                                                          ],
-                                                        ),
-                                                      ),
-                                                      
-                              ],
-                            ),*/

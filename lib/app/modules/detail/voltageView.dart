@@ -31,13 +31,13 @@ class _VoltageViewState extends State<VoltageView> {
         UserState state = StatesProvider().readState();
         state.points += 10;
         userInfo.voltage +=1;
-        ProfileProvider().saveProfile(userInfo,"");
+        ProfileProvider().saveProfile(userInfo,"",context);
         StatesProvider().writeState(state);
   }else if(Negative.length >= 100){
     yourVoltage = []; 
         VoltageProvider().writeVolt(yourVoltage);
         userInfo.voltage -=1;
-        ProfileProvider().saveProfile(userInfo,"");
+        ProfileProvider().saveProfile(userInfo,"",context);
   }
   }
     return Scaffold(

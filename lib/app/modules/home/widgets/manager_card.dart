@@ -61,7 +61,7 @@ class _ManagerCardState extends State<ManagerCard> {
                     height: 1.5.wp,
                   ),
                   Text(
-                    'Credit : $total DA',
+                    'Credit : $total',
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: const TextStyle(

@@ -35,6 +35,7 @@ class _LoadingPageState extends State<LoadingPage> {
 
   @override
   Widget build(BuildContext context) {
+    
     return  Container(
         color: Theme.of(context).cardColor,
         child: Column(

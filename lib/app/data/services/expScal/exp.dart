@@ -1,7 +1,9 @@
 import 'dart:math' as math;
+import 'package:SoloLife/app/data/models/achivments.dart';
 import 'package:SoloLife/app/data/models/profile.dart';
 import 'package:SoloLife/app/data/models/state.dart';
 import 'package:SoloLife/app/data/providers/task/provider.dart';
+import 'package:flutter/material.dart';
 
 bool monster = ProfileProvider().readProfile().keys!.contains("monster");
 
@@ -69,21 +71,25 @@ Map sideQuests(String title,){
   
 }
 //? added exp to player
-void addExp(int exp){
+void addExp(int exp,BuildContext context){
   Profile user = ProfileProvider().readProfile();
   user.exp = user.exp + exp;
-  ProfileProvider().saveProfile(user, "exp");
+  ProfileProvider().saveProfile(user, "exp",context);
 }
 
 //? added coins to player
-void addCoins(int coin){
+void addCoins(int coin,BuildContext context){
   Profile user = ProfileProvider().readProfile();
   user.coins = user.coins + coin;
-  ProfileProvider().saveProfile(user, "");
+  ProfileProvider().saveProfile(user, "",context);
+    achievementsHandler("done",context);
+    achievementsHandler("ongoing",context);
+    achievementsHandler("all",context);
+    achievementsHandler("coins",context);
 }
 
 //? manage the ranks
-Map<String,dynamic> rankManager(){
+Map<String,dynamic> rankManager(BuildContext context){
   List<UserState> requirement = [
     // D rank -- 20
     UserState(agility: 1,intelligence: 1,sense: 1,strength: 30,vitality: 15,mana: 1),
@@ -104,19 +110,19 @@ Map<String,dynamic> rankManager(){
   ];
   UserState userState = StatesProvider().readState();
   Profile profile = ProfileProvider().readProfile();
-  Map<String,dynamic> rank = {"change":false,"rank":"Didn't meat the requirement"};
+  Map<String,dynamic> rank = {"change":false,"rank":"?"};
   switch (profile.rank) {
     case "E":
     if(checkState(userState, requirement[0])){
       rank = {"change":true,"rank":"D"};
-      rankUp("D");
+      rankUp("D",context);
     }else{
       return {"change":false,"rank":"Require strength: 30 vitality: 15"};
     }
     case "D":
       if(checkState(userState, requirement[1])){
       rank = {"change":true,"rank":"C"};
-            rankUp("C");
+            rankUp("C",context);
 
     }else{
       return {"change":false,"rank":"Require intelligence: 20 mana: 30"};
@@ -124,7 +130,7 @@ Map<String,dynamic> rankManager(){
     case "C":
       if(checkState(userState, requirement[2])){
       rank = {"change":true,"rank":"B"};
-            rankUp("B");
+            rankUp("B",context);
 
     }else{
       return {"change":false,"rank":"Require agility: 60 sense: 30"};
@@ -132,7 +138,7 @@ Map<String,dynamic> rankManager(){
     case "B":
       if(checkState(userState, requirement[3])){
       rank = {"change":true,"rank":"A"};
-            rankUp("A");
+            rankUp("A",context);
 
     }else{
       return {"change":false,"rank":"Require strength: 80 vitality: 80"};
@@ -140,7 +146,7 @@ Map<String,dynamic> rankManager(){
     case "A":
         if(checkState(userState, requirement[4])){
       rank = {"change":true,"rank":"S"};
-            rankUp("S");
+            rankUp("S",context);
 
     }else{
       return {"change":false,"rank":"Require agility: 100,intelligence: 100,sense: 100,strength: 200,vitality: 200,mana: 200"};
@@ -148,7 +154,7 @@ Map<String,dynamic> rankManager(){
      case "S":
           if(checkState(userState, requirement[4])){
       rank = {"change":true,"rank":"SS"};
-            rankUp("SS");
+            rankUp("SS",context);
 
     }else{
       return {"change":false,"rank":"Require agility: 200,intelligence: 220,sense: 200,strength: 400,vitality: 400,mana: 400"};
@@ -156,7 +162,7 @@ Map<String,dynamic> rankManager(){
     case "SS":
            if(checkState(userState, requirement[4])){
       rank = {"change":true,"rank":"SSS"};
-            rankUp("SSS");
+            rankUp("SSS",context);
 
     }else{
       return {"change":false,"rank":"Require agility: 400,intelligence: 400,sense: 400,strength: 800,vitality: 800,mana: 800"};
@@ -164,12 +170,15 @@ Map<String,dynamic> rankManager(){
     case "SSS":
            if(checkState(userState, requirement[4])){
       rank = {"change":true,"rank":"Z"};
-            rankUp("Z");
-
+            rankUp("Z",context);
+           }else if(profile.rank == "Z"){
+            rank = {"change":false,"rank":"Surpass the limit"};
     }else{
       return {"change":false,"rank":"Require agility: 800,intelligence: 900,sense: 900,strength: 1600,vitality: 1600,mana: 1600"};
     }
   }
+  profile.rank = rank["rank"];
+  ProfileProvider().saveProfile(profile, "", context);
   return rank;
 }
 
@@ -182,8 +191,8 @@ bool checkState(UserState state,UserState otherState){
   && state.vitality >= otherState.vitality);
 }
 
-void rankUp(String rank){
+void rankUp(String rank,BuildContext context){
   Profile user = ProfileProvider().readProfile();
   user.rank = rank;
-  ProfileProvider().saveProfile(user, "");
+  ProfileProvider().saveProfile(user, "",context);
 }

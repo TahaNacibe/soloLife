@@ -1,4 +1,5 @@
 import 'package:SoloLife/app/core/utils/extensions.dart';
+import 'package:SoloLife/app/data/models/achivments.dart';
 import 'package:SoloLife/app/modules/home/controller.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
@@ -41,7 +42,7 @@ class AddDialog extends StatelessWidget {
                             EasyLoading.showError('Please select task type');
                           } else {
                            var success =
-                              homeCtrl.addTodo(homeCtrl.editCtrl.text,isFree);
+                              homeCtrl.addTodo(homeCtrl.editCtrl.text,isFree,context);
                           if (success) {
                              homeCtrl.updateTodos();
                       homeCtrl.changeTask(null);

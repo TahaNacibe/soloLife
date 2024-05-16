@@ -2,6 +2,7 @@
 
 import 'package:SoloLife/app/core/utils/extensions.dart';
 import 'package:SoloLife/app/core/values/icons.dart';
+import 'package:SoloLife/app/data/models/achivments.dart';
 import 'package:SoloLife/app/data/models/profile.dart';
 import 'package:SoloLife/app/data/models/solo.dart';
 import 'package:SoloLife/app/data/models/state.dart';
@@ -36,13 +37,13 @@ String helpHint = """'master control' --> to activate master level\n
 
 
 //? the main commands control
-String authorityLevel(String command){
+String authorityLevel(String command,BuildContext context){
   if(command.contains("change name")){
-    changeName(command);
+    changeName(command,context);
     return "name changed complete";
   }
-  if(command.contains("wail")){
-    userInfo.keys!.contains("wail")? userInfo.keys!.remove("wail") :userInfo.keys!.add("wail");
+  if(command.contains("reverse")){
+    userInfo.keys!.contains("reverse")? userInfo.keys!.remove("reverse") :userInfo.keys!.add("reverse");
     return "Okay You Have it now ";
   }
   // check if user is master 
@@ -50,27 +51,27 @@ String authorityLevel(String command){
     // if master activate authority according to command and return string to show the user the action
     // solo protocol
   if(command.contains("protocol solo") && !authority.contains("solo")){
-    soloProtocol();
+    soloProtocol(context);
     return "Protocol Solo Activated";
     // dream pack
   }else if(command.contains('protocol dream') && !authority.contains("dream")){
-    dreamProtocol();
+    dreamProtocol(context);
     return "protocol dream Activated";
     // manager budget pack
   }else if(command.contains('protocol manager') && !(authority.contains("manager"))){
-    managerProtocol();
+    managerProtocol(context);
     return "Protocol manager Activated";
     // monster protocol case
   }else if(command.contains('protocol monster') && !authority.contains("monster")){
-    monsterProtocol();
+    monsterProtocol(context);
     return "monster protocol activated";
     // voltage
   }else if(command.contains('protocol voltage') && !authority.contains("voltage")){
-    voltageMode();
+    voltageMode(context);
     return "voltage protocol activated";
     // change the user name
   }else if(command.contains('player mode')){
-    playerMood();
+    playerMood(context);
     return "Player Mode Activated";
     // delete all data
   }else if(command.contains('self destruct')){
@@ -78,12 +79,12 @@ String authorityLevel(String command){
     return 'erase all data';
   // set password
   }else if(command.contains('set password')){
-    return setPassword(command);
+    return setPassword(command,context);
     // help command
   }else if(command.contains('help')){
     return helpHint;
   }else if(command.contains('protocol op')){
-    op();
+    op(context);
     return "All States has been Maxed out";
     // 
   }else if(command.contains("change theme")){
@@ -106,7 +107,7 @@ String authorityLevel(String command){
   // here if user try to activate master control 
   }else if(command.contains("master control") && !authority.contains("master")){
     // do the command
-    masterControl();
+    masterControl(context);
     return 'Master control activated ';
   }else if(command.contains("help")){
     return helpHint;
@@ -119,23 +120,25 @@ String authorityLevel(String command){
 }
 
 //? activate master control
-void masterControl(){
+void masterControl(BuildContext context){
     userInfo.keys!.add('master');
     // update the user data
-    ProfileProvider().saveProfile(userInfo,"");
+    ProfileProvider().saveProfile(userInfo,"",context);
 }
 
 //? activate master control
-void voltageMode(){
+void voltageMode(BuildContext context){
     userInfo.keys!.add('voltage');
     // update the user data
-    ProfileProvider().saveProfile(userInfo,"");
+    ProfileProvider().saveProfile(userInfo,"",context);
 }
 //? activate solo protocol
-void soloProtocol(){
+void soloProtocol(BuildContext context){
+  if(!userInfo.keys!.contains("solo")){
     userInfo.keys!.add('solo');
+  }
     // update the user data
-    ProfileProvider().saveProfile(userInfo,"");
+    ProfileProvider().saveProfile(userInfo,"",context);
     String time = DateTime.now().toIso8601String();
     List<Daily> startUp = [
     Daily(title:"Push-Ups  [100]" , exp: getExpForTheTasks(userInfo.level,false),standard: true,timeStamp:time, coins: getCoinsForTheTasks(false)),
@@ -148,7 +151,7 @@ void soloProtocol(){
 }
 
 //? activate dream protocol
-void dreamProtocol(){
+void dreamProtocol(BuildContext context){
   // create the dream task pack
   List<Task> tasks = TaskProvider().readTasks();
   var task = Task(
@@ -161,29 +164,29 @@ void dreamProtocol(){
    TaskProvider().writeTasks(tasks);
     userInfo.keys!.add('dream');
     // update the user data
-    ProfileProvider().saveProfile(userInfo,"");
+    ProfileProvider().saveProfile(userInfo,"",context);
 }
 
 //? activate manager protocol
-void managerProtocol(){
+void managerProtocol(BuildContext context){
     userInfo.keys!.add('manager');
     // update the user data
-    ProfileProvider().saveProfile(userInfo,"");
+    ProfileProvider().saveProfile(userInfo,"",context);
 }
 
 //? activate monster protocol
-void monsterProtocol(){
+void monsterProtocol(BuildContext context){
     userInfo.keys!.add('monster');
     // update the user data
-    ProfileProvider().saveProfile(userInfo,"");
+    ProfileProvider().saveProfile(userInfo,"",context);
 }
 //? change user name
-void changeName(String command){
+void changeName(String command,BuildContext context){
   List<String> value = command.split(' ');
   value.removeRange(0, 2);
   String result = value.join(" ");
   userInfo.userName = result;
-  ProfileProvider().saveProfile(userInfo,"");
+  ProfileProvider().saveProfile(userInfo,"",context);
 }
 
 //? delete data
@@ -194,19 +197,19 @@ void eraseAll(){
 }
 
 //? setPassword
-String setPassword(String command){
+String setPassword(String command,BuildContext context){
   List<String> value = command.split('--');
   value.removeRange(0, 1);
   // no old password case
   if(userInfo.password.isEmpty){
   userInfo.password = value[0];
-    ProfileProvider().saveProfile(userInfo,"");
+    ProfileProvider().saveProfile(userInfo,"",context);
   return "password set complete";
   }else if(value.length ==2 && userInfo.password == value[0].trim()){
     value.removeAt(0);
     String result = value.join("");
   userInfo.password = result;
-    ProfileProvider().saveProfile(userInfo,"");
+    ProfileProvider().saveProfile(userInfo,"",context);
   return "password update complete";
   }else{
     return "incorrect password\n to update password enter: set password --'old password' --'new password'";
@@ -215,11 +218,11 @@ String setPassword(String command){
 }
 
 //? protocol op as fuck
-void op(){
+void op(BuildContext context){
   Profile user = ProfileProvider().readProfile();
   user.level = 9999;
   user.exp = getExpToNextLevel(9999);
-  ProfileProvider().saveProfile(user,"exp");
+  ProfileProvider().saveProfile(user,"exp",context);
   StatesProvider().writeState(
     UserState(
       agility: 1000,intelligence: 1000,
@@ -228,8 +231,8 @@ void op(){
 }
 
 //? remove master state
-void playerMood(){
+void playerMood(BuildContext context){
     userInfo.keys!.remove('master');
     // update the user data
-    ProfileProvider().saveProfile(userInfo,"");
+    ProfileProvider().saveProfile(userInfo,"",context);
 }

@@ -1,5 +1,6 @@
 import 'package:SoloLife/app/core/utils/extensions.dart';
 import 'package:SoloLife/app/core/utils/icon_pack_icons.dart';
+import 'package:SoloLife/app/data/models/achivments.dart';
 import 'package:SoloLife/app/data/models/solo.dart';
 import 'package:SoloLife/app/data/providers/task/provider.dart';
 import 'package:SoloLife/app/data/services/expScal/exp.dart';
@@ -46,12 +47,7 @@ class _SoloDetailState extends State<SoloDetail> {
                                       timeStamp: time));
     }
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Daily Tasks'),
-        leading: IconButton(onPressed:(){
-          Navigator.popAndPushNamed(context, "HomePage");
-        }, icon: Icon(Icons.arrow_back)),
-      ),
+      
       body: PopScope(
          canPop: false,
  onPopInvoked: (didPop) async {
@@ -63,178 +59,186 @@ class _SoloDetailState extends State<SoloDetail> {
         child: ListView(
           children: [
             // Add task text field and button
-                        Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Container(
-                  decoration:BoxDecoration(
-                          borderRadius: BorderRadius.circular(10),
-                        color: Theme.of(context).cardColor,
-                        boxShadow:[BoxShadow(
-                        color: Theme.of(context).shadowColor, // Shadow color
-                        spreadRadius: 2, // Extends the shadow beyond the box
-                        blurRadius: 5, // Blurs the edges of the shadow
-                        offset: const Offset(0, 3), // Moves the shadow slightly down and right
-                        )]
-                        ),
-                  child: Column(children:[Row(
-                    children: [
-                      Container(padding: const EdgeInsets.all(12),
-                        decoration:const BoxDecoration(
-                  color: Colors.purple,
-                  borderRadius: BorderRadius.only(
-                    topLeft: Radius.circular(10),
-                    bottomRight: Radius.circular(10))
-                                  ),
-                        child: const Icon(
-                          Icons.star,
-                          color: Colors.white,
-                        ),
-                      ),
-                      SizedBox(
-                        width: 3.0.wp,
-                      ),
-                      Text(
-                        "Daily Quests",
-                        style: TextStyle(
-                          fontFamily: "Quick",
-                          fontSize: 14.0.sp,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      )
-                    ],
-                  ),
-                
-                  Obx(() {
-                    return Padding(
-                        padding: EdgeInsets.only(
-                          left: 14.0.wp,
-                          right: 14.0.wp,
-                          top: 1.0.wp,
-                        ),
-                        child: Column(
-                          children: [
-                             Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                              children: [
-                                actionBarItem("onGoing","${onGoing.length}",Colors.purple,false),
-                                actionBarItem("Finished","${finished.length}",Colors.purple,false),
-                                actionBarItem("Tasks","$totalTodos",Colors.purple,false),
-                              ],
-                            ),
-                            Padding(
-                              padding: const EdgeInsets.symmetric(vertical: 4),
-                              child: Row(
+                        Container(
+                          decoration:BoxDecoration(
+                                  borderRadius: BorderRadius.vertical(bottom: Radius.circular(10)),
+                                color: Theme.of(context).cardColor,
+                                boxShadow:[BoxShadow(
+                                color: Theme.of(context).shadowColor, // Shadow color
+                                spreadRadius: 2, // Extends the shadow beyond the box
+                                blurRadius: 5, // Blurs the edges of the shadow
+                                offset: const Offset(0, 6), // Moves the shadow slightly down and right
+                                )]
+                                ),
+                          child: Column(children:[Row(mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Row(
                                 children: [
-                                  
-                                  Expanded(
-                                      child: StepProgressIndicator(
-                                        roundedEdges: Radius.circular(15),
-                                    totalSteps: totalTodos.value == 0 ? 1 : totalTodos.value,
-                                    currentStep: finished.length,
-                                    size: 5,
-                                    padding: 0,
-                                    selectedGradientColor: LinearGradient(
-                                      begin: Alignment.topLeft,
-                                      end: Alignment.bottomRight,
-                                      colors: [Colors.purple.withOpacity(0.5), Colors.purple],
+                                  Container(padding: const EdgeInsets.all(12),
+                                    decoration:const BoxDecoration(
+                              //color: Colors.purple,
+                              borderRadius: BorderRadius.only(
+                                topLeft: Radius.circular(10),
+                                bottomRight: Radius.circular(10))
+                                              ),
+                                    child: const Icon(
+                                      Icons.star,
+                                      color: Colors.purple,
                                     ),
-                                    unselectedGradientColor: LinearGradient(
-                                      begin: Alignment.topLeft,
-                                      end: Alignment.bottomRight,
-                                      colors: [Colors.grey[300]!, Colors.grey[300]!],
+                                  ),
+                                  SizedBox(
+                                    width: 3.0.wp,
+                                  ),
+                                  Text(
+                                    "Daily Quests",
+                                    style: TextStyle(
+                                      fontFamily: "Quick",
+                                      fontSize: 14.0.sp,
+                                      fontWeight: FontWeight.bold,
                                     ),
-                                  ))
+                                  )
                                 ],
                               ),
+                              IconButton(onPressed: (){
+                                Navigator.popAndPushNamed(context, "HomePage");
+                              }, icon: Icon(Icons.close))
+                            ],
+                          ),
+                        
+                          Obx(() {
+                            return Padding(
+                                padding: EdgeInsets.only(
+                                  left: 14.0.wp,
+                                  right: 14.0.wp,
+                                  top: 1.0.wp,
+                                ),
+                                child: Column(
+                                  children: [
+                                     Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                      children: [
+                                        actionBarItem("onGoing","${onGoing.length}",Colors.purple,false),
+                                        actionBarItem("Finished","${finished.length}",Colors.purple,false),
+                                        actionBarItem("Tasks","$totalTodos",Colors.purple,false),
+                                      ],
+                                    ),
+                                    Padding(
+                                      padding: const EdgeInsets.symmetric(vertical: 4),
+                                      child: Row(
+                                        children: [
+                                          
+                                          Expanded(
+                                              child: StepProgressIndicator(
+                                                roundedEdges: Radius.circular(15),
+                                            totalSteps: totalTodos.value == 0 ? 1 : totalTodos.value,
+                                            currentStep: finished.length,
+                                            size: 5,
+                                            padding: 0,
+                                            selectedGradientColor: LinearGradient(
+                                              begin: Alignment.topLeft,
+                                              end: Alignment.bottomRight,
+                                              colors: [Colors.purple.withOpacity(0.5), Colors.purple],
+                                            ),
+                                            unselectedGradientColor: LinearGradient(
+                                              begin: Alignment.topLeft,
+                                              end: Alignment.bottomRight,
+                                              colors: [Colors.grey[300]!, Colors.grey[300]!],
+                                            ),
+                                          ))
+                                        ],
+                                      ),
+                                    ),
+                                   
+                                  ],
+                                ),
+                              );
+                            }),
+                           Padding(
+                              padding: const EdgeInsets.symmetric(horizontal:60),
+                              child: Divider(color: Theme.of(context).iconTheme.color!.withOpacity(.2),),
                             ),
-                           
-                          ],
+                                      Padding(
+                        padding: EdgeInsets.symmetric(
+                          vertical: 1.0.wp,
+                          horizontal: 5.0.wp,
                         ),
-                      );
-                    }),
-                   Padding(
-                      padding: const EdgeInsets.symmetric(horizontal:60),
-                      child: Divider(color: Theme.of(context).iconTheme.color!.withOpacity(.2),),
-                    ),
-              Padding(
-                padding: EdgeInsets.symmetric(
-                  vertical: 1.0.wp,
-                  horizontal: 5.0.wp,
-                ),
-                child: Center(
-                  child: TextFormField(
-                    cursorColor: Theme.of(context).iconTheme.color,
-                    controller: titleController,
-                    decoration: InputDecoration(
-                        focusedBorder: const UnderlineInputBorder(
-                          borderSide: BorderSide(color: Colors.transparent),
-                        ),
-                          enabledBorder:const UnderlineInputBorder(
-                          borderSide: BorderSide(color: Colors.transparent),),
-                        prefixIcon: Padding(
-                        padding: const EdgeInsets.only(bottom:10,right: 8),
-                        child: GestureDetector(
-                          onTap:(){
-                             isFree = !isFree;
-                            setState((){});
-                          },
-                          child: Container(
-                            padding: EdgeInsets.all(6),
-                            decoration: BoxDecoration(
-                              border: Border.all(color:isFree? Colors.red : Colors.blue),
-                              borderRadius: BorderRadius.circular(15)
-                            ),
-                            child: Text(
-                              textAlign: TextAlign.center,
-                              isFree? "No Exp" : "Exp",
-                            style: TextStyle(
-                              color: isFree? Colors.red : Colors.blue,
-                              fontFamily:"Quick",
-                              fontWeight: FontWeight.w600),),
+                        child: Center(
+                          child: TextFormField(
+                            cursorColor: Theme.of(context).iconTheme.color,
+                            controller: titleController,
+                            decoration: InputDecoration(
+                                focusedBorder: const UnderlineInputBorder(
+                                  borderSide: BorderSide(color: Colors.transparent),
+                                ),
+                                  enabledBorder:const UnderlineInputBorder(
+                                  borderSide: BorderSide(color: Colors.transparent),),
+                                prefixIcon: Padding(
+                                padding: const EdgeInsets.only(bottom:10,right: 8),
+                                child: GestureDetector(
+                                  onTap:(){
+                                     isFree = !isFree;
+                                    setState((){});
+                                  },
+                                  child: Container(
+                                    padding: EdgeInsets.all(6),
+                                    decoration: BoxDecoration(
+                                      border: Border.all(color:isFree? Colors.red : Colors.blue),
+                                      borderRadius: BorderRadius.circular(15)
+                                    ),
+                                    child: Text(
+                                      textAlign: TextAlign.center,
+                                      isFree? "No Exp" : "Exp",
+                                    style: TextStyle(
+                                      color: isFree? Colors.red : Colors.blue,
+                                      fontFamily:"Quick",
+                                      fontWeight: FontWeight.w600),),
+                                  ),
+                                ),
+                                                        ),
+                                suffixIcon: IconButton(
+                                  onPressed: () {
+                                    String title = titleController.text;
+                                    if (title.isNotEmpty) {
+                                     int point = userInfo.keys!.contains("monster")? 2 : 1;
+                                      if(isExist(title)){
+                                        EasyLoading.showError('Todo item already exists');
+                                        setState((){});
+                                      }else{
+                                        String time = DateTime.now().toIso8601String();
+                                        
+                                          if (title.contains("--free")) {
+                                          title = title.replaceAll("--free", "");
+                                          isFree = true;
+                                      }
+                                        addTask(title, isFree, getExpForTheTasks(level,isFree)*point, time,getCoinsForTheTasks(isFree));
+                                              DailyTasks().writeTasks(tasks);
+                                              achievementsHandler("world",context);
+                                              EasyLoading.showSuccess('Todo item add success');
+                                              setState(() {});
+                                      }
+                                      if(tasks.length == 20){
+                                      achievementsHandler("LetHimCock",context);
+                                      }
+                                      isFree = false;
+                                      titleController.clear();
+                                     }
+                                    },
+                                  icon: Container(padding: const EdgeInsets.all(12),
+                                  decoration: BoxDecoration(
+                            color: Colors.purple,
+                            borderRadius: BorderRadius.circular(15),
+                                            ),
+                                    child: const Icon(Icons.add,color:Colors.white)),
+                                )),
+                            validator: (value) {
+                              if (value == null || value.trim().isEmpty) {
+                                return 'Please enter the quest title';
+                              }
+                              return null;
+                            },
                           ),
                         ),
-                                                ),
-                        suffixIcon: IconButton(
-                          onPressed: () {
-                            String title = titleController.text;
-                            if (title.isNotEmpty) {
-                             int point = userInfo.keys!.contains("monster")? 2 : 1;
-                              if(isExist(title)){
-                                EasyLoading.showError('Todo item already exists');
-                                setState((){});
-                              }else{
-                                String time = DateTime.now().toIso8601String();
-                                
-                                  if (title.contains("--free")) {
-                                  title = title.replaceAll("--free", "");
-                                  isFree = true;
-                              }
-                                addTask(title, isFree, getExpForTheTasks(level,isFree)*point, time,getCoinsForTheTasks(isFree));
-                                      DailyTasks().writeTasks(tasks);
-                                      EasyLoading.showSuccess('Todo item add success');
-                                      setState(() {});
-                              }
-                              isFree = false;
-                              titleController.clear();
-                             }
-                            },
-                          icon: Container(padding: const EdgeInsets.all(12),
-                          decoration: BoxDecoration(
-                    color: Colors.purple,
-                    borderRadius: BorderRadius.circular(15),
-                                    ),
-                            child: const Icon(Icons.add,color:Colors.white)),
-                        )),
-                    validator: (value) {
-                      if (value == null || value.trim().isEmpty) {
-                        return 'Please enter the quest title';
-                      }
-                      return null;
-                    },
-                  ),
-                ),
-              ),]),
-                ),
-              ),
+                                      ),]),
+                        ),
             // List of daily tasks
             Padding(
               padding: const EdgeInsets.all(8.0),
@@ -332,8 +336,8 @@ class _SoloDetailState extends State<SoloDetail> {
                                           value: !task.isGoing,
                                                                         onChanged: (value){
                                         task.isGoing = !task.isGoing;
-                                        addExp(task.exp);
-                                        addCoins(task.coins);
+                                        addExp(task.exp,context);
+                                        addCoins(task.coins,context);
                                         widget.dailyTasksController.writeTasks(tasks);
                                         setState((){});                      
                                                                         },
@@ -432,8 +436,8 @@ class _SoloDetailState extends State<SoloDetail> {
                                               value: !task.isGoing,
                                                                             onChanged: (value){
                                             task.isGoing = !task.isGoing;
-                                            addExp(task.exp);
-                                            addCoins(task.coins);
+                                            addExp(task.exp,context);
+                                            addCoins(task.coins,context);
                                             widget.dailyTasksController.writeTasks(tasks);
                                             setState((){});                      
                                                                             },
@@ -777,6 +781,7 @@ void bottomShit(BuildContext context, Daily element,void Function() refresh) {
                               onTap: () {
                                 tasks.remove(element);
                             widget.dailyTasksController.writeTasks(tasks);
+                                achievementsHandler("nuh",context);
                           refresh(); // Refresh the UI
                           Navigator.pop(context); // Close the bottom sheet
                               },

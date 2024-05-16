@@ -34,17 +34,17 @@ String weightedRandomSelection(List<Map<String, dynamic>> items) {
   return items.last['name'];
 }
 
-void updateClass(String job){
+void updateClass(String job,BuildContext context){
   // get user data as var user
     final Profile user = ProfileProvider().readProfile();
     user.job = job;
-   ProfileProvider().saveProfile(user, "");
+   ProfileProvider().saveProfile(user, "",context);
 
 }
 
 
 const List<String> jobFilter = ['Healer','Ranger','Assassin','Tanker','Fighter','Mage','Necromancer'];
-Map<String,dynamic> classReword(String job){
+Map<String,dynamic> classReword(String job,BuildContext context){
   Map<String,dynamic> result = {"message":" error (0o0!)"};
   // get user States 
   UserState state = StatesProvider().readState();
@@ -54,38 +54,38 @@ Map<String,dynamic> classReword(String job){
     state.mana += 25;
     state.vitality +=25;
     StatesProvider().writeState(state);
-    checkAndAdd(jobFilter[0]);
+    checkAndAdd(jobFilter[0],context);
     return {"message":"mana 25 vitality 25"};
     //
     //? in case the job is 
   }else if(job == jobFilter[1]){
     state.agility +=35;
     state.sense +=10;
-    checkAndAdd(jobFilter[1]);
+    checkAndAdd(jobFilter[1],context);
     StatesProvider().writeState(state);
     return {"message":"agility 35 sense 10"};
   }else if(job == jobFilter[2]){
     state.sense +=20;
     state.agility +=30;
-    checkAndAdd(jobFilter[2]);
+    checkAndAdd(jobFilter[2],context);
     StatesProvider().writeState(state);
     return {"message":"sense 20 agility 30"};
   }else if(job == jobFilter[3]){
     state.vitality += 35;
     state.agility += 10;
-    checkAndAdd(jobFilter[3]);
+    checkAndAdd(jobFilter[3],context);
     StatesProvider().writeState(state);
     return {"message":"vitality 35 agility 10"};
   }else if(job == jobFilter[4]){
     state.strength +=25;
     state.vitality +=25;
-    checkAndAdd(jobFilter[4]);
+    checkAndAdd(jobFilter[4],context);
     StatesProvider().writeState(state);
     return {"message":"strength 25 vitality 25"};
   }else if(job == jobFilter[5]){
     state.intelligence +=30;
     state.mana +=20;
-    checkAndAdd(jobFilter[5]);
+    checkAndAdd(jobFilter[5],context);
     StatesProvider().writeState(state);
     return {"message":"mana 20 intelligence 30"};
   }else if(job == jobFilter[6]){
@@ -93,7 +93,7 @@ Map<String,dynamic> classReword(String job){
     state.intelligence +=30;
     state.agility += 10;
     state.vitality +=10;
-    checkAndAdd(jobFilter[6]);
+    checkAndAdd(jobFilter[6],context);
     StatesProvider().writeState(state);
     return {"message":"mana 30 intelligence 25 agility 10 vitality 10"};
   }else{
@@ -101,12 +101,12 @@ Map<String,dynamic> classReword(String job){
   }
 }
 
-void checkAndAdd(String title){
+void checkAndAdd(String title,BuildContext context){
   final Profile user = ProfileProvider().readProfile();
   updateJopRank(title);
   if(!user.oldJobs!.contains(title)){
     user.oldJobs!.add(title);
-    ProfileProvider().saveProfile(user, "");
+    ProfileProvider().saveProfile(user, "",context);
   }
 }
 

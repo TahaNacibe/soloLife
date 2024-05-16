@@ -69,7 +69,16 @@ class DoingList extends StatelessWidget {
                     ),
               StatefulBuilder(
                 builder: (context,setState) {
+                  bool isOrdering = false;
                   return ReorderableListView(
+                    onReorderStart: (_){
+                      isOrdering = true;
+                      setState((){});
+                    },
+                    onReorderEnd: (_){
+                      isOrdering = false;
+                      setState((){});
+                    },
                     onReorder: (oldIndex, newIndex) {
                   setState(() {
                     if (newIndex > oldIndex) {
@@ -93,7 +102,7 @@ class DoingList extends StatelessWidget {
                                                         color: Theme.of(context).cardColor,
                                                         boxShadow:[
                                                         BoxShadow(
-                                                        color: Theme.of(context).shadowColor, // Shadow color
+                                                        color:isOrdering? Colors.transparent: Theme.of(context).shadowColor, // Shadow color
                                                         spreadRadius: 2, // Extends the shadow beyond the box
                                                         blurRadius: 5, // Blurs the edges of the shadow
                                                         offset: const Offset(0, 3), // Moves the shadow slightly down and right
@@ -139,7 +148,7 @@ class DoingList extends StatelessWidget {
                                                         onChanged: (value) {
                                                           element['coins'] = element['coins'] ?? 10;
                                                           print(element);
-                                                          homeCtrl.doneTodo(element['title'],element["exp"], element['coins']);
+                                                          homeCtrl.doneTodo(element['title'],element["exp"], element['coins'],context);
                                                         },
                                                       ),
                                                     ),

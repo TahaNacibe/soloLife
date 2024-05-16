@@ -1,3 +1,4 @@
+import 'package:SoloLife/app/data/models/achivments.dart';
 import 'package:SoloLife/app/data/models/profile.dart';
 import 'package:SoloLife/app/data/models/task.dart';
 import 'package:SoloLife/app/data/providers/task/provider.dart';
@@ -98,7 +99,7 @@ class HomeController extends GetxController {
     return todos.any((element) => element['title'] == title);
   }
 //? add new sub task 'toDo' to parent Task
-  bool addTodo(String title,bool state) {
+  bool addTodo(String title,bool state,BuildContext context) {
     bool isFree = false;
       if (title.contains("--free") || state) {
       title = title.replaceAll("--free", "");
@@ -119,6 +120,8 @@ class HomeController extends GetxController {
       return false;
     }
     doingTodos.add(todo);
+    achievementsHandler("ongoing",context);
+    achievementsHandler("all",context);
     return true;
   }
 //? update the toDos List
@@ -136,7 +139,8 @@ class HomeController extends GetxController {
     tasks.refresh();
   }
 //? set a subTask as done or not done ??
-  void doneTodo(String title,int addExp, int coins) {
+  void doneTodo(String title,int addExp, int coins,BuildContext context) {
+    Profile user = ProfileProvider().readProfile();
     var doingTodo = {'title': title, 'done': false,"exp":addExp, "coins":coins};
     int index = doingTodos.indexWhere(
         (element) => mapEquals<String, dynamic>(doingTodo, element));
@@ -145,11 +149,16 @@ class HomeController extends GetxController {
     var doneTodo = {'title': title, 'done': true,"exp":addExp, "coins":coins};
     doneTodos.add(doneTodo);
     // add the new exp to the user
-    userData.exp = userData.exp + addExp;
-    userData.coins = userData.coins + coins;
-    ProfileProvider().saveProfile(userData,"exp");
+    user.exp = user.exp + addExp;
+    user.coins = user.coins + coins;
+    ProfileProvider().saveProfile(user,"exp",context);
     doingTodos.refresh();
     doneTodos.refresh();
+    //? achievements handling
+    achievementsHandler("done",context);
+    achievementsHandler("ongoing",context);
+    achievementsHandler("all",context);
+    achievementsHandler("coins",context);
   }
 //? delete the finished toDos
   void deleteDoneTodo(dynamic doneTodo) {

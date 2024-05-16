@@ -1,6 +1,7 @@
 import 'package:SoloLife/app/core/utils/extensions.dart';
 import 'package:SoloLife/app/core/utils/icon_pack_icons.dart';
 import 'package:SoloLife/app/core/values/jobs.dart';
+import 'package:SoloLife/app/data/models/achivments.dart';
 import 'package:SoloLife/app/data/models/profile.dart';
 import 'package:easy_pie_chart/easy_pie_chart.dart';
 import 'package:SoloLife/app/data/models/state.dart';
@@ -29,6 +30,7 @@ class ReportPage extends StatelessWidget {
       child: Obx(() {
         var createdTasks = homeCtrl.getTotalTask();
         var completedTasks = homeCtrl.getTotalDoneTask();
+        var onGoingTasks = createdTasks - completedTasks;
         var precent = (completedTasks / createdTasks * 100).toStringAsFixed(0);
         return StatefulBuilder(
           builder: (context,setState) {
@@ -160,7 +162,7 @@ class ReportPage extends StatelessWidget {
                       ],
                     ),
                           Padding(
-                            padding: const EdgeInsets.all(16),
+                            padding: const EdgeInsets.all(8),
                             child: Column(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
@@ -168,24 +170,15 @@ class ReportPage extends StatelessWidget {
                                 completedTasks,
                                 "Tasks you complete", 
                                 Icons.done_all_rounded,context),
-                                Padding(
-                                  padding: const EdgeInsets.symmetric(horizontal: 60),
-                                  child: Divider(),
-                                ),
+                                
                                 _buildStatus(
                                   Colors.blue, 
-                                  createdTasks,"OnGoing Tasks", Icons.refresh_rounded,context),
-                                Padding(
-                                  padding: const EdgeInsets.symmetric(horizontal: 60),
-                                  child: Divider(),
-                                ),
+                                  onGoingTasks,"OnGoing Tasks", Icons.refresh_rounded,context),
+                                
                                 _buildStatus(
                                   Colors.indigo, 
-                                  completedTasks+createdTasks,"Total Tasks", Icons.task,context),
-                                Padding(
-                                  padding: const EdgeInsets.symmetric(horizontal: 60),
-                                  child: Divider(),
-                                ),
+                                  createdTasks,"Total Tasks", Icons.task,context),
+                                
                               ],
                             ),
                           ),
@@ -215,10 +208,19 @@ class ReportPage extends StatelessWidget {
                     Icon(IconPack.trophy, color: Colors.indigo,size: 35,),
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 20),
-                        child: Text("check your achievements ",
-                        style: TextStyle(fontFamily: "Quick",
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold),),
+                        child: Column(crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text("check your achievements ",
+                            style: TextStyle(fontFamily: "Quick",
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold),),
+                            Text("${user.achievements.length} Unlocked ",
+                            textAlign: TextAlign.left,
+                            style: TextStyle(fontFamily: "Quick",
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold),),
+                          ],
+                        ),
                       )
                   ],),)),
               ),
@@ -326,10 +328,18 @@ class ReportPage extends StatelessWidget {
                     Icon(Icons.shopping_cart_rounded, color: Colors.indigo,size: 35,),
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 20),
-                        child: Text("Open Shop ",
-                        style: TextStyle(fontFamily: "Quick",
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold),),
+                        child: Column(
+                          children: [
+                            Text("Open Shop ",
+                            style: TextStyle(fontFamily: "Quick",
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold),),
+                            Text("${user.coins} Runes ",
+                            style: TextStyle(fontFamily: "Quick",
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold),),
+                          ],
+                        ),
                       )
                   ],),)),
               )
@@ -345,67 +355,70 @@ class ReportPage extends StatelessWidget {
   }
 
   Widget _buildStatus(Color color, int number, String text,IconData icon,BuildContext context) {
-    return Container(
-      padding: EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(15),
-        color: Theme.of(context).cardColor,
-          
-          boxShadow:[BoxShadow(
-          color: Theme.of(context).shadowColor, // Shadow color
-          spreadRadius: 1, // Extends the shadow beyond the box
-          blurRadius: 5, // Blurs the edges of the shadow
-          offset: const Offset(0, 3), // Moves the shadow slightly down and right
-          )]
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Row(crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Container(
-            height: 3.0.wp,
-            width: 3.0.wp,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              border: Border.all(
-                width: 0.5.wp,
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8),
+      child: Container(
+        padding: EdgeInsets.all(18),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(15),
+          color: Theme.of(context).cardColor,
+            
+            boxShadow:[BoxShadow(
+            color: Theme.of(context).shadowColor, // Shadow color
+            spreadRadius: 1, // Extends the shadow beyond the box
+            blurRadius: 5, // Blurs the edges of the shadow
+            offset: const Offset(0, 3), // Moves the shadow slightly down and right
+            )]
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Row(crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Container(
+              height: 3.0.wp,
+              width: 3.0.wp,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                border: Border.all(
+                  width: 0.5.wp,
+                  color: color,
+                ),
+              ),
+            ),
+            SizedBox(width: 2.0.wp),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      '$number',
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 13.0.sp,
+                      ),
+                    ),
+                    SizedBox(height: 1.0.wp),
+                    Text(
+                      text,
+                      style: TextStyle(
+                        fontFamily: "Quick",fontWeight: FontWeight.bold,
+                        fontSize: 11.0.sp,
+                        color: Colors.grey,
+                      ),
+                    )
+                  ],
+                ),
+              ],
+            ),
+            Container(
+              padding: EdgeInsets.all(6),
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
                 color: color,
               ),
-            ),
-          ),
-          SizedBox(width: 2.0.wp),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    '$number',
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 13.0.sp,
-                    ),
-                  ),
-                  SizedBox(height: 1.0.wp),
-                  Text(
-                    text,
-                    style: TextStyle(
-                      fontFamily: "Quick",fontWeight: FontWeight.bold,
-                      fontSize: 11.0.sp,
-                      color: Colors.grey,
-                    ),
-                  )
-                ],
-              ),
-            ],
-          ),
-          Container(
-            padding: EdgeInsets.all(6),
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              color: color,
-            ),
-            child: Icon(icon,color: Colors.white))
-        ],
+              child: Icon(icon,color: Colors.white))
+          ],
+        ),
       ),
     );
   }
@@ -595,8 +608,8 @@ Widget item(String title,bool isOpen,IconData icon,BuildContext context,Color co
         Container(
               padding: EdgeInsets.all(8),
               decoration: BoxDecoration(
-                border: Border.all(color:color),
-                borderRadius: BorderRadius.circular(30)
+                border: Border.all(color:color,width: 1.5),
+                borderRadius: BorderRadius.circular(15)
               ),
           child: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [

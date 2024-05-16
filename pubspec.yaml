@@ -59,6 +59,11 @@ dependencies:
   progress_border: ^0.1.5
   fl_chart: ^0.67.0
   easy_pie_chart: ^1.0.0
+  file: ^6.1.0
+  shared_preferences: ^2.2.3
+  provider: ^6.1.2
+  top_snackbar_flutter: ^3.1.0
+  animated_snack_bar: ^0.4.0
 
 dev_dependencies:
 icons_launcher:

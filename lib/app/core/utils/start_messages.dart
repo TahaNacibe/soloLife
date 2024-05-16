@@ -3,20 +3,29 @@ import 'package:flutter/material.dart';
 
 List <Widget> start =[limit(),over(),you(),showThem(),loose(),lesson(),lesson2(),level()];
 Widget limit(){
-  return  Padding(
-             padding: const EdgeInsets.all(12),
-             child: Text.rich(
-              style: TextStyle(
-                fontFamily: "Quick",
-                fontSize: 22,
-                fontWeight: FontWeight.bold
-              ),
-              TextSpan(children: [
-              TextSpan(text:" Surpass Your"),
-              TextSpan(text: " Limit ",style: TextStyle(color: Colors.red)),
-              TextSpan(text: "Here And Now"),
-             ])),
-           );
+  return  Column(
+    crossAxisAlignment: CrossAxisAlignment.center,
+    mainAxisAlignment: MainAxisAlignment.center,
+    children: [
+      Padding(
+                 padding: const EdgeInsets.all(12),
+                 child: Center(
+                   child: Text.rich(
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontFamily: "Quick",
+                      fontSize: 22,
+                      fontWeight: FontWeight.bold
+                    ),
+                    TextSpan(children: [
+                    TextSpan(text:" Surpass Your"),
+                    TextSpan(text: " Limit ",style: TextStyle(color: Colors.red)),
+                    TextSpan(text: "Here And Now"),
+                   ])),
+                 ),
+               ),
+    ],
+  );
 }
 
 Widget over(){

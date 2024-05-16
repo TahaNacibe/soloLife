@@ -1,3 +1,4 @@
+import 'package:SoloLife/app/data/models/achivments.dart';
 import 'package:flutter/material.dart';
 import 'package:speech_to_text/speech_to_text.dart';
 
@@ -46,7 +47,7 @@ class _CommandPageState extends State<CommandPage> {
   void _onSpeechResult(result) {
     setState(() {
       _wordsSpoken = "${result.recognizedWords}";
-      response = authorityLevel(_wordsSpoken.toLowerCase());
+      response = authorityLevel(_wordsSpoken.toLowerCase(),context);
       setState(() {
         
       });
@@ -130,8 +131,11 @@ class _CommandPageState extends State<CommandPage> {
                               color:Colors.black,
                               shape: BoxShape.circle),
                             child: GestureDetector(onTap: (){
-                                              result = authorityLevel(command.text);
+                                              result = authorityLevel(command.text,context);
                                               command.clear();
+                                              if(result != "Not recognized command" && result != "only master level can use commands !! " ){
+                                                achievementsHandler("hax",context);
+                                              }
                                               setState((){});
                                             }, child:  const Icon(Icons.arrow_forward_ios,color:Colors.white)),
                           ),

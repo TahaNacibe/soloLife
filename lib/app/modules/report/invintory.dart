@@ -1,9 +1,14 @@
+import 'dart:math';
+
+import 'package:SoloLife/app/core/utils/icon_pack_icons.dart';
 import 'package:SoloLife/app/core/utils/items_archive.dart';
 import 'package:SoloLife/app/core/values/item_drop.dart';
+import 'package:SoloLife/app/data/models/achivments.dart';
 import 'package:SoloLife/app/data/models/profile.dart';
 import 'package:SoloLife/app/data/models/shopItem.dart';
 import 'package:SoloLife/app/data/models/state.dart';
 import 'package:SoloLife/app/data/providers/task/provider.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:material_dialogs/dialogs.dart';
@@ -19,241 +24,635 @@ class Inventory extends StatefulWidget {
 
 
 class _InventoryState extends State<Inventory> {
-      // get user data as var user
-    final Profile user = ProfileProvider().readProfile();
+  // get user data as var user
+  final Profile user = ProfileProvider().readProfile();
+
   @override
   Widget build(BuildContext context) {
-      // get the Inventory items by their id 
-List<ShopItem> items(List<dynamic> ids){
-  List<ShopItem> result = [];
-  for (String id in ids) {
-    result.add(archive[id]);
-  }
-  return result;
-}
-// create empty map
-Map<String, int> countMap = {};
-// map through the list of ids and set counter in the map using entries
- user.inventory.forEach((element){
-  // add one for each one
-  countMap[element] = (countMap[element] ?? 0) +1;
-});
-// create list of the map entries we gathered before
-List<MapEntry<String, int>> countList = countMap.entries.toList();
-// dialog for using Runes
-void dialogBox(String name, String id, String image){
-  String attribute = name.replaceAll("Rune", "");
-       Dialogs.materialDialog(
-          customView: Column(
-            children: [
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Image.asset(image),
-              ),
-              Text('Want to use $name now? '),
-              Text("Gain $attribute +50",style: TextStyle(color: Colors.blue),),
-            ],
-          ),
-          customViewPosition: CustomViewPosition.BEFORE_ACTION,
-          titleStyle: TextStyle(fontFamily: "Quick", fontWeight: FontWeight.bold,fontSize: 20,color: Colors.red),
-          msgStyle: TextStyle(fontFamily: "Quick",fontWeight: FontWeight.w600,fontSize: 16),
-          color: Theme.of(context).cardColor,
-          context: context,
-          actions: [
-            IconsOutlineButton(
-              onPressed: () {
-                Navigator.pop(context);
-              },
-              text: 'Cancel',
-              iconData: Icons.cancel_outlined,
-              textStyle: TextStyle(color: Colors.grey,fontWeight: FontWeight.bold),
-              iconColor: Colors.blue,
-            ),
-            IconsOutlineButton(
-              onPressed: () {
-                addBones(id);
-                user.inventory.remove(id);
-                ProfileProvider().saveProfile(user,"");
-                setState(() {});
-                Navigator.pop(context);
-              },
-              text: 'Use',
-              iconData: Icons.arrow_forward_ios,
-              color: Colors.green,
-              textStyle: TextStyle(color: Colors.white,fontWeight: FontWeight.bold),
-              iconColor: Colors.white,
-            ),
-          ]);
-                                                                
+    // create empty map to count occurrences of each item
+    Map<String, int> countMap = {};
+
+    // iterate through the user's inventory to count occurrences of each item
+    for (String itemId in user.inventory) {
+      // add one for each occurrence of the item
+      countMap[itemId] = (countMap[itemId] ?? 0) + 1;
     }
 
-// Ui
+    // convert the map entries to a list for easier access
+    List<MapEntry<String, int>> countList = countMap.entries.toList();
+    List<MapEntry<String, int>> filteredCountList = countList
+    .where((entry) => archive[entry.key].itemType != 'frame')
+    .toList();
+    int count = filteredCountList.fold(0, (sum, entry) => sum + entry.value);
+    // UI
     return Scaffold(
       appBar: AppBar(),
-      body: ListView(children: [
-        Stack(alignment: Alignment.centerLeft,
-          children: [
-            Divider(thickness: 1.4,),
-            Container(
-              padding: EdgeInsets.all(8),
-              color: Theme.of(context).cardColor,
-              child: Text("Inventory", 
-              style: TextStyle(
-                fontSize: 20,
-                fontFamily: "Quick",
-                fontWeight: FontWeight.w600),)),
-          ],
-        ),
-        GridView.builder(
-          shrinkWrap: true,
-          itemCount: countList.length,
-          physics: NeverScrollableScrollPhysics(),
-          gridDelegate: 
-          SliverGridDelegateWithFixedCrossAxisCount( 
-            crossAxisCount: 3
-          ), 
-          itemBuilder: (context,index){
-            ShopItem item = archive[countList[index].key];
-            String count = countList[index].value == 1? "" : "x${countList[index].value }";
-            return Padding(
-              padding: const EdgeInsets.all(4),
-              child: itemData(item.title,item.image,count,(){
-                if(item.itemType == "Rune"){
-                  dialogBox(item.title, countList[index].key, item.image);
-                }else if(item.itemType == "Box"){
-                  bottomShit(item.title, item.image,(){setState(() {
-                    
-                  });},item.id);
-                }
-                
-              }),
-            );
-            //
-          })
-      ],),
-    );
+      body: ListView(
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+              Container(
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(22),
+                      border: Border.all(color:Colors.orange,width: 1.5)),
+                    child: Row(children: [
+                      Text("  ${user.coins}  ",
+                      style: TextStyle(
+                        fontFamily: "Quick",
+                        fontWeight: FontWeight.bold,
+                        fontSize: 18
+                      ),),
+                      Container(
+                        padding: EdgeInsets.all(8),
+                        decoration: BoxDecoration(
+                        color: Colors.orange,
+                        borderRadius: BorderRadius.circular(20)
+                      ),
+                        child: Icon(IconPack.rune_stone,color: Colors.white,))
+                    ],),
+                  ),
+                  Container(
+                  decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(22),
+                      border: Border.all(color:Colors.indigo,width: 1.5)),
+                  child: Row(children: [
+                    Text("  ${count} ",
+                    style: TextStyle(
+                      fontFamily: "Quick",
+                      fontWeight: FontWeight.bold,
+                      fontSize: 18
+                    ),),
+                    Container(
+                      padding: EdgeInsets.all(8),
+                        decoration: BoxDecoration(
+                        color: Colors.indigo,
+                        borderRadius: BorderRadius.circular(20)
+                      ),
+                      child: Icon(IconPack.basket,color: Colors.white,))
+                  ],),
+                ),
+            ],),
+          ),
+          Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 12),
+          child: Stack(alignment: Alignment.centerLeft,
+            children: [
+              Divider(),
+              Container(
+                padding: EdgeInsets.all(8),
+                color: Theme.of(context).cardColor,
+                child: Text("Inventory:",style: TextStyle(fontFamily: "Quick", fontWeight: FontWeight.w700,fontSize: 18),)),
+            ],
+          ),
+                ),
+          // other UI widgets
+          GridView.builder(
+  shrinkWrap: true,
+  itemCount: filteredCountList.length,
+  physics: NeverScrollableScrollPhysics(),
+  gridDelegate:
+      SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 3),
+  itemBuilder: (context, index) {
+    // get the item and its count at the current index
+    String itemId = filteredCountList[index].key;
+    int itemCount = filteredCountList[index].value;
 
+    // find the corresponding item in the archive
+    ShopItem item = archive[itemId];
+
+    // build the widget for the item
+    return Padding(
+      padding: const EdgeInsets.all(4),
+      child: 
+      itemData(item.title, item.image, itemCount.toString(), () {
+        if (item.itemType == "Rune") {
+          bottomShitRune(item.title, item.image, () {
+            achievementsHandler("state",context);
+            setState(() {});
+          }, itemId,item.description);
+        } else if (item.itemType == "Box") {
+          bottomShitBox(item.title, item.image, () {
+            setState(() {});
+          }, itemId);
+        }else if(item.itemType == 'coins'){
+          return bottomShitBag("coins",item.image,(){},item.id);
+        }
+      },item.rarity,),
+    );
+  },
+)
+
+        ],
+      ),
+    );
   }
-  Widget itemData(String name, String image, String count, void Function() onTap){
+  Widget itemData(String name, String image, String count, void Function() onTap,int rarity){
+    Color color = rarity == 3? Colors.blue: rarity == 4? Colors.purple :rarity == 5? Colors.orange : Colors.red;
     return GestureDetector(
       onTap:
           onTap,
-      child: Container(
-        padding: EdgeInsets.all(8),
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(10),
-          color: Theme.of(context).cardColor,
-          boxShadow:[BoxShadow(
-            color: Theme.of(context).shadowColor, // Shadow color
-            spreadRadius: 1, // Extends the shadow beyond the box
-            blurRadius: 5, // Blurs the edges of the shadow
-            offset: const Offset(0, 3), // Moves the shadow slightly down and right
-            )]
-        ),
-        child: Stack(alignment: Alignment.center,
-          children: [
-            Image.asset(image),
-            //Divider(),
-            Align(alignment: Alignment.bottomCenter,
-              child: Container(color: Colors.white.withOpacity(.4),
-                child: Text.rich(
-                  TextSpan(
-                    style: TextStyle(fontFamily: "Quick",fontWeight: FontWeight.w600),
-                    children:[
-                    TextSpan(text: name),
-                    TextSpan(text:count,style: TextStyle(color: Colors.green))
-                  ])),
-              ),
+      child: Stack(
+        children: [
+          Container(
+            padding: EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(15),
+              border: Border.all(color: color.withOpacity(.5),width: 1.5),
+              color: Theme.of(context).cardColor,
+              boxShadow:[BoxShadow(
+                color: Theme.of(context).shadowColor, // Shadow color
+                spreadRadius: 1, // Extends the shadow beyond the box
+                blurRadius: 5, // Blurs the edges of the shadow
+                offset: const Offset(0, 3), // Moves the shadow slightly down and right
+                )]
+            ),
+            child: Stack(alignment: Alignment.topRight,
+              children: [
+                Image.asset(image),
+                //Divider(),
+                Align(alignment: Alignment.topRight,
+                  child: Container(
+                    padding: EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      boxShadow:[BoxShadow(
+                color: color.withOpacity(.5), // Shadow color
+                spreadRadius: 1, // Extends the shadow beyond the box
+                blurRadius: 5, // Blurs the edges of the shadow
+                offset: const Offset(0, 3), // Moves the shadow slightly down and right
+                )],
+                      color:color,
+                      shape: BoxShape.circle                ),
+                    child: Text.rich(
+                      TextSpan(
+                        children:[
+                        TextSpan(text:count,
+                        style: TextStyle(
+                          fontFamily: "Quick",
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white))
+                      ])),
+                  ),
+                )
+              ],
+            )),
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Align(alignment: Alignment.bottomCenter,
+                child: Container(child: Text(name,
+                style: TextStyle(fontFamily: "Quick",fontWeight: FontWeight.bold),),)),
             )
-          ],
-        )),
+        ],
+      ),
     );
   }
 
-  void bottomShit(String BoxType, String image, void Function() refresh,String id){
+  void showImageDialogBox(
+    bool haveImage,
+    BuildContext context, 
+    String title, 
+    String imageUrl,
+    bool isNew,
+    [IconData icon = IconPack.rune_stone]) {
+  showDialog(
+    context: context,
+    builder: (BuildContext context) {
+      return AlertDialog(
+        title: Text(
+          title,
+          textAlign: TextAlign.center,
+          style: TextStyle(fontWeight: FontWeight.bold,fontFamily: "Quick"),
+        ),
+        content: Container(
+          height:!haveImage? 100 : 200, // Adjust the height as needed
+          child: Stack(alignment: Alignment.center,
+            children: [
+              if(haveImage)
+              Image.asset(
+                imageUrl,
+                fit: BoxFit.contain,
+              ),
+              if(!haveImage)
+              Icon(icon, size: 100,),
+              if(isNew)
+              Align(alignment: Alignment.topRight,
+                child: Container(padding: EdgeInsets.all(8),
+                                      decoration: BoxDecoration(
+                                      color: Colors.red,
+                                      borderRadius: BorderRadius.only(bottomLeft: Radius.circular(15))
+                                    ),
+                                      child: Text("New",
+                                    style: TextStyle(fontFamily: "Quick",fontWeight: FontWeight.bold,color: Colors.white),),),
+              )
+            ],
+          ),
+        ),
+        actions: <Widget>[
+          GestureDetector(
+            onTap: () {
+              Navigator.pop(context);
+              setState(() {
+                
+              });
+            },
+            child: Container(
+              padding: EdgeInsets.all(12),
+              decoration: BoxDecoration(
+              border: Border.all(color:Colors.blue),
+              borderRadius: BorderRadius.circular(15)
+            ),
+              child: Text('Close',
+              style: TextStyle(
+                fontSize: 18,
+                fontFamily: "Quick",
+                fontWeight: FontWeight.bold,
+                color: Colors.blue),)),
+          ),
+        ],
+      );
+    },
+  );
+}
+
+  void bottomShitBox(String BoxType, String image, void Function() refresh,String id){
     String selectedItem = "";
+    bool isNew = false;
     ShopItem selectedItemRow = ShopItem(title: "Item", image: "image", price: 0, itemType: "", id: "id",rarity: 3);
      showModalBottomSheet(
               context: context,
               builder: (BuildContext context) {
-                return StatefulBuilder(
-                  builder: (context,setState) {
-                    return Container(
-                      height: 300,
-                      child: Center(
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          mainAxisSize: MainAxisSize.min,
-                          children: <Widget>[
-                            Image.asset(image),
-                            Text(BoxType),
-                            SizedBox(height: 20),
-                            ElevatedButton(
-                              onPressed: () {
-                                 // Example usage
-                    
-                    
-                      // Select one item based on its probability
-                      itemProbabilities = BoxType.contains("Old")? oldItemProbabilities : BoxType.contains("Curse")? curseItemProbabilities : itemProbabilities;
-                      selectedItem = selectItemByProbability(itemProbabilities);
+                    return Padding(
+                      padding: const EdgeInsets.all(16),
+                      child: Container(
+                        height: 300,
+                        child: Center(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            mainAxisSize: MainAxisSize.min,
+                            children: <Widget>[
+                              Text(BoxType,
+                              style: TextStyle(fontFamily: "Quick",fontWeight: FontWeight.bold,fontSize: 20)),
+                              Image.asset(image,width: 200,height: 200,),
+                              Padding(
+                                padding: const EdgeInsets.symmetric(horizontal: 20,vertical: 4),
+                                child: Divider(),
+                              ),
+                              Container(
+                                child: GestureDetector(
+                                  onTap: () {
+                                      // Select one item based on its probability
+                      selectedItem = selectItemByRarity(BoxType);
                       selectedItemRow = archive[selectedItem];
-                      selectedItem = selectedItemRow.title;
                       user.inventory.remove(id);
-                      ProfileProvider().saveProfile(user, "");
-                      if(selectedItemRow.itemType != 'frame'){
+                      ProfileProvider().saveProfile(user, "",context);
+                      isNew = !user.inventory.contains(selectedItemRow.id);
+                      if (selectedItemRow.itemType == 'frame' && !user.inventory.contains(selectedItem) || selectedItemRow.itemType != 'frame') {
                         user.inventory.add(selectedItemRow.id);
                       }
-                      setState(() {
-                        
-                      });
+                        Navigator.pop(context);
+                        showImageDialogBox(true,context,selectedItemRow.title,selectedItemRow.image,isNew);
+                      setState(() {});
                       refresh();
-                              },
-                              child: Text('open',style: TextStyle(color: Colors.black),),
-                            ),
-                            Text("item:$selectedItem (probability:${itemProbabilities[selectedItemRow.id]})")
-                          ],
+
+                                  },
+                                  child: Container(
+                                    padding: EdgeInsets.all(12),
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(15),
+                                      border: Border.all(color:Colors.blue,width: 1.5)
+                                    ),
+                                    child: Text('open Box',style: TextStyle(color: Colors.blue,fontFamily: "Quick",fontWeight: FontWeight.bold),)),
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
                       ),
                     );
-                  }
-                );
+
               },
             );
   }
+  void bottomShitBag(String BoxType, String image, void Function() refresh,String id){
+     showModalBottomSheet(
+              context: context,
+              builder: (BuildContext context) {
+                    return Padding(
+                      padding: const EdgeInsets.all(16),
+                      child: Container(
+                        height: 300,
+                        child: Center(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: <Widget>[
+                              Text("Runes",
+                              style: TextStyle(fontFamily: "Quick",fontWeight: FontWeight.bold,fontSize: 20)),
+                              Icon(IconPack.rune_stone,size: 100,),
+                              Text("20 ~~ 1000 Runes can drop",style: TextStyle(fontFamily: "Quick",fontWeight: FontWeight.bold,fontSize: 25),),
+                              Padding(
+                                padding: const EdgeInsets.symmetric(horizontal: 20,vertical: 4),
+                                child: Divider(),
+                              ),
+                              Container(
+                                child: GestureDetector(
+                                  onTap: () {
+                                      // Select one item based on its probability
+                      int result = getRandomNumber();
+                      user.inventory.remove(id);
+                      user.coins = user.coins + result;
+                      ProfileProvider().saveProfile(user, "",context);
+                        Navigator.pop(context);
+                        showImageDialogBox(false,context,"You Got $result ruins",image,false);
+                      setState(() {});
+                      refresh();
+
+                                  },
+                                  child: Container(
+                                    padding: EdgeInsets.all(12),
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(15),
+                                      border: Border.all(color:Colors.blue,width: 1.5)
+                                    ),
+                                    child: Text('open Bag',style: TextStyle(color: Colors.blue,fontFamily: "Quick",fontWeight: FontWeight.bold),)),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    );
+
+              },
+            );
+  }
+
+void runeAction(String name){
+List<String> parts = name.split(" ");
+  int value = parts[1] == "Rune"? 50 : parts[1] == "Fragment"? 25: 10;
+  UserState state = StatesProvider().readState();
+  void refresh(){
+    StatesProvider().writeState(state);
+    setState((){});
+  }
+  switch (parts[0]) {
+    case "Sense":
+      state.sense += value;
+      refresh();
+    case "Strength":
+      state.strength += value;
+      refresh();
+    case "Intelligence":
+      state.intelligence += value;
+      refresh();
+    case "Mana":
+      state.mana += value;
+      refresh();
+    case "Agility":
+      state.agility += value;
+      refresh();
+    case "Vitality":
+      state.vitality += value;
+      refresh();
+    default:
+  }
+
 }
 
-void addBones(String id){
-  //get user States 
-UserState state = StatesProvider().readState(); 
-    switch (id) {
-      //in case Agility Rune
-      case "AgilityRune":
-      state.agility = state.agility+ 50;
-      StatesProvider().writeState(state);
+void bottomShitRune(String BoxType, String image, void Function() refresh,String id,String description){
+     showModalBottomSheet(
+              context: context,
+              builder: (BuildContext context) {
+                    return Padding(
+                      padding: const EdgeInsets.all(16),
+                      child: Container(
+                        height: 300,
+                        child: Center(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            mainAxisSize: MainAxisSize.min,
+                            children: <Widget>[
+                              Text.rich(
+                                textAlign: TextAlign.center,
+                                TextSpan(children: [
+                                TextSpan(
+                                text:"$BoxType\n",
+                              ),
+                              TextSpan(text:description)]),
+                              style: TextStyle(fontFamily: "Quick",fontWeight: FontWeight.bold,fontSize: 20)),
+                              Image.asset(image,width: 180,height: 180,),
+                              Container(
+                                child: GestureDetector(
+                                  onTap: () {
+                                      // Select one item based on its probability
+                      user.inventory.remove(id);
+                      ProfileProvider().saveProfile(user, "",context);
+                      //ToDo : the function handling the states for each stone
+                      runeAction(BoxType);
+                        Navigator.pop(context);
+                        int value = description.contains("+50")? 50 :description.contains("+25")? 25:10;
+                      showImageDialogBox(false,context,"$BoxType was Used State will be raised by $value",image,false,IconPack.trophy);
+                      setState(() {});
+                      refresh();
 
-      // in case Intelligence Rune
-      case "IntelligenceRune":
-      state.intelligence = state.intelligence+ 50;
-      StatesProvider().writeState(state);
+                                  },
+                                  child: Container(
+                                    padding: EdgeInsets.all(12),
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(15),
+                                      border: Border.all(color:Colors.blue,width: 1.5)
+                                    ),
+                                    child: Text('Use Rune now',style: TextStyle(color: Colors.blue,fontFamily: "Quick",fontWeight: FontWeight.bold),)),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    );
 
-      // in case mana Rune
-      case "ManaRune":
-      state.mana = state.mana+ 50;
-      StatesProvider().writeState(state);
+              },
+            );
+  }
 
-      // in case Strength Rune
-      case "StrengthRune":
-      state.strength = state.strength+ 50;
-      StatesProvider().writeState(state);
 
-      // in case Vitality Rune
-      case "VitalityRun":
-      state.vitality = state.vitality+ 50;
-      StatesProvider().writeState(state);
+  Widget shopItemRuneCard(ShopItem item,bool isOwned,bool showInfo){
+  int rarity = item.rarity;
+  String description = item.description;
+  Color color = rarity == 3? Colors.blue: rarity == 4? Colors.purple :rarity == 5? Colors.orange : Colors.red;
+  String image = item.image;
+  // set free for 0$ items
+  String priceTag = item.price != 0? "${item.price}" : "Free";
+  // the Ui for the Frame item Card
+  return Padding(
+    padding: const EdgeInsets.all(8),
+    child: Stack(alignment: Alignment.topCenter,
+      children: [
+        Container(
+          decoration: BoxDecoration(
+            border: Border.all(color: color.withOpacity(.1)),
+          color: color.withOpacity(.2),      
+          borderRadius: BorderRadius.circular(15),    
+            boxShadow:[BoxShadow(
+                color: Theme.of(context).shadowColor, // Shadow color
+                spreadRadius: 1, // Extends the shadow beyond the box
+                blurRadius: 5, // Blurs the edges of the shadow
+                offset: const Offset(0, 3), // Moves the shadow slightly down and right
+                )]
+          ),
+          child: Container(
+          decoration: BoxDecoration(
+            border: Border.all(color:color.withOpacity(.8)),
+                    boxShadow:[BoxShadow(
+                color: color.withOpacity(.1), // Shadow color
+                spreadRadius: 1, // Extends the shadow beyond the box
+                blurRadius: 5, // Blurs the edges of the shadow
+                offset: const Offset(0, 3), // Moves the shadow slightly down and right
+                )],
+            borderRadius: BorderRadius.circular(15),
+            color: Theme.of(context).cardColor.withOpacity(.95),
+          ),
+            child: Column(mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+              Container(
+                child: Image.asset(image,width: 100,height: 80,),),
+                    Container(decoration: BoxDecoration(
+                      boxShadow:[BoxShadow(
+                color: Theme.of(context).shadowColor, // Shadow color
+                spreadRadius: 1, // Extends the shadow beyond the box
+                blurRadius: 5, // Blurs the edges of the shadow
+                offset: const Offset(0, 3), // Moves the shadow slightly down and right
+                )],
+                      color: color.withOpacity(.65),
+                      borderRadius: BorderRadius.vertical(top:Radius.circular(30),bottom: Radius.circular(15))
+                  ),
+                    child: Column(
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.only(bottom:4,top:4),
+                          child: Row(mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text("${item.rarity}",style: TextStyle(color:Colors.white),),
+                              Icon(Icons.star,color: Colors.white,)
+                            ],
+                          ),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.only(bottom: 6),
+                          child: GestureDetector(
+                                  onTap: (){
+                                           
+                              } ,
+                                  child: Container(
+                                    padding: EdgeInsets.symmetric(vertical:6,horizontal: 18),
+                                    decoration: BoxDecoration(
+                                      boxShadow:[BoxShadow(
+                                     color: Colors.white.withOpacity(.3), // Shadow color
+                                     spreadRadius: 1, // Extends the shadow beyond the box
+                                     blurRadius: 5, // Blurs the edges of the shadow
+                                     offset: const Offset(0, 3), // Moves the shadow slightly down and right
+                                  )],
+                                      border: Border.all(color:Colors.white,width: 1.5),
+                                      borderRadius: BorderRadius.circular(15)
+                                    ),
+                                    child: Text(priceTag,
+                                    style: TextStyle(
+                                      fontFamily: "Quick",
+                                      fontWeight: FontWeight.bold,
+                                      color:Colors.white ),)),
+                                ),
+                        )
+                      ],
+                    ),
+                  )      ,
+              
+            ],),
+          ),
+        ),
+                Container(
+                  padding: EdgeInsets.all(6),
+                  child: Text("${item.title}",
+                  style: TextStyle(fontFamily: "Quick",fontWeight: FontWeight.bold,),
+                  maxLines: 1,overflow: TextOverflow.ellipsis,)),
+                  if(showInfo)
+        Column(
+          children: [
+            Expanded(
+              child: Container(
+                padding: EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: color.withOpacity(1),
+                  borderRadius: BorderRadius.circular(15)
+                ),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    Icon(Icons.info,color:Colors.white),
+                    Text(description,
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16
+                    ),),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        )
+  
+      ],
+    ));
+  
+}
+}
 
-      //In case Sense Rune
-      case "SenseRune":
-      state.sense = state.sense+ 50;
-      StatesProvider().writeState(state);
+
+
+String selectItemByRarity(String type) {
+  int split = type.contains("Curse")? 3 : type.contains("Old")? 2 :1;
+  // Adjusted rarity weights
+  Map<String, double> adjustedWeights = {};
+
+  // Adjusted weights for each rarity level
+  double weight3 = 4.0; // Adjust this value for rarity 3
+  double weight4 = 4.0/split; // Adjust this value for rarity 4
+  double weight5 = 2.0/split; // Adjust this value for rarity 5
+  double weight6 = 1.0/split; // Adjust this value for rarity 6
+
+
+  // Assign adjusted weights based on rarity
+ Map<String, ShopItem> newArchive = Map.from(archive); // Create a copy to avoid modifying the original map
+newArchive.removeWhere((key, value) => value.itemType == "Box");
+  for (var entry in newArchive.entries) {
+    int rarity = entry.value.rarity;
+    if (rarity == 3) {
+      adjustedWeights[entry.key] = weight3;
+    } else if (rarity == 4) {
+      adjustedWeights[entry.key] = weight4;
+    } else if (rarity == 5) {
+      adjustedWeights[entry.key] = weight5;
+    } else if (rarity == 6) {
+      adjustedWeights[entry.key] = weight6;
     }
+  }
+
+  // Calculate total adjusted weight
+  double totalAdjustedWeight = adjustedWeights.values.reduce((a, b) => a + b);
+
+  // Generate a random number between 0 and totalAdjustedWeight
+  double randomWeight = Random().nextDouble() * totalAdjustedWeight;
+
+  // Iterate through items and find the one whose adjusted rarity range contains the random number
+  double cumulativeWeight = 0;
+  for (var entry in adjustedWeights.entries) {
+    cumulativeWeight += entry.value;
+    if (randomWeight <= cumulativeWeight) {
+      return entry.key;
+    }
+  }
+
+  // Should never reach here, but return a default item just in case
+  return newArchive.keys.first;
 }

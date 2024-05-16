@@ -28,5 +28,25 @@ List<Icon> getIcons() {
       IconData(shopIcon, fontFamily: 'MaterialIcons'),
       color: lightBlue,
     ),
+    Icon(
+      trophyIcon,
+      color: indigo,
+    ),
+    Icon(
+      musicIcon,
+      color: orange,
+    ),
+    Icon(
+      bookIcon,
+      color: red,
+    ),
+    Icon(
+      codeIcon,
+      color: teal,
+    ),
+    Icon(
+      coffeeIcon,
+      color: brown,
+    ),
   ];
 }

@@ -199,7 +199,7 @@ class _BudgetManagerState extends State<BudgetManager> {
                         color:total<0? Colors.red : Colors.green,
                         borderRadius: BorderRadius.circular(30)
                        ),
-                         child: Text("total : $total DA",
+                         child: Text("total : $total ",
                           style: const TextStyle(
                             color:Colors.white,
                             fontFamily: "Quick",
@@ -226,7 +226,7 @@ class _BudgetManagerState extends State<BudgetManager> {
                       ),
                       TextSpan(text: lastState? "Deposit  " : "Withdraw ",style:TextStyle(color: lastState? Colors.green : Colors.red) ,
                       ),
-                      TextSpan(text: "${log.isEmpty? 0: log.last.amount}DA",style: TextStyle(color: lastState? Colors.green : Colors.red)),
+                      TextSpan(text: "${log.isEmpty? 0: log.last.amount}",style: TextStyle(color: lastState? Colors.green : Colors.red)),
                       ],style: TextStyle(
                         fontFamily: "Quick",
                         fontWeight: FontWeight.bold,
@@ -263,13 +263,18 @@ class _BudgetManagerState extends State<BudgetManager> {
                                       BudgetProvider().writeBudget(budget);
                                   controller.clear();
                                       setState((){});
-                                }, icon: const Icon(Icons.keyboard_double_arrow_down,color:Colors.white))),
+                                }, icon: const Icon(Icons.add,color:Colors.white))),
                          ),
                               contentPadding: const EdgeInsets.only(left:8),
-                              border: OutlineInputBorder(borderRadius: BorderRadius.circular(15)),
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(15),
+                                borderSide: BorderSide(
+                                  width: .5,
+                                  color:Theme.of(context).iconTheme.color!.withOpacity(.4))),
                               focusedBorder: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(15),
                                 borderSide: BorderSide(
+                                  width: .5,
                                 color:Theme.of(context).iconTheme.color!.withOpacity(.4),)),
                             ),
                             keyboardType: const TextInputType.numberWithOptions(decimal: false),
