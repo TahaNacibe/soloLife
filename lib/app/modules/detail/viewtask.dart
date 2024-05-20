@@ -15,8 +15,8 @@ class DetailPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    var task = homeCtrl.task.value!;
     bool isFree = false;
+    var task = homeCtrl.task.value!;
     var color = HexColor.fromHex(task.color);
     return StatefulBuilder(
       builder: (context,setState) {
@@ -46,46 +46,64 @@ class DetailPage extends StatelessWidget {
                   child: Column(children:[
                     Row(mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Row(
-                        children: [
-                          Container(
-                            padding: const EdgeInsets.all(12),
-                            decoration:BoxDecoration(
-                                            borderRadius: const BorderRadius.only(
-                                              //topLeft: Radius.circular(10),
-                                              bottomRight: Radius.circular(10))
-                                      ),
-                            child: Icon(
-                              IconData(
-                                task.icon,
-                                fontFamily: 'MaterialIcons',
+                      Padding(
+                        padding: const EdgeInsets.only(left:8.0),
+                        child: Container(padding: EdgeInsets.symmetric(vertical: 12,horizontal: 12),
+                          decoration: 
+                        BoxDecoration(borderRadius: BorderRadius.circular(15)),
+                          child: Row(
+                            children: [
+                              Container(
+                                padding: const EdgeInsets.all(2),
+                                decoration:BoxDecoration(
+                                                borderRadius: const BorderRadius.only(
+                                                  //topLeft: Radius.circular(10),
+                                                  bottomRight: Radius.circular(10))
+                                          ),
+                                child: Icon(
+                                  IconData(
+                                    task.icon,
+                                    fontFamily: 'MaterialIcons',
+                                  ),
+                                  color: color,
+                                ),
                               ),
-                              color: color,
-                            ),
+                               SizedBox(
+                                    width: 3.0.wp,
+                                  ),
+                                  Text(
+                                    task.title,
+                                    style: TextStyle(
+                                      fontFamily: "Quick",
+                                      fontSize: 14.0.sp,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  )
+                            ],
                           ),
-                      SizedBox(
-                        width: 3.0.wp,
-                      ),
-                      Text(
-                        task.title,
-                        style: TextStyle(
-                          fontFamily: "Quick",
-                          fontSize: 14.0.sp,
-                          fontWeight: FontWeight.bold,
                         ),
-                      ),
-                        ],
                       ),
                        Row(
                          children: [
                            //ToDo change that in this case if the user close the app in the create task it wont save
-                           IconButton(
-                             onPressed: () {
-                               Get.back();
-                               homeCtrl.updateTodos();
-                               homeCtrl.editCtrl.clear();
-                             },
-                             icon: const Icon(Icons.close),
+                           Padding(
+                             padding: const EdgeInsets.all(8.0),
+                             child: Container(
+                              padding: EdgeInsets.all(6),
+                              decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              color: color
+                             ),
+                               child: GestureDetector(
+                                 onTap: () {
+                                   Get.back();
+                                   homeCtrl.updateTodos();
+                                   homeCtrl.editCtrl.clear();
+                                   Navigator.popAndPushNamed(context, "HomePage");
+                                 },
+                                 child: const Icon(Icons.close,color: Colors.white,),
+                               ),
+                             ),
                            )
                          ],
                        ),
@@ -106,9 +124,9 @@ class DetailPage extends StatelessWidget {
                         children: [
                            Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                             children: [
-                              actionBarItem("onGoing","$ongoingTodo",color,false),
-                              actionBarItem("Finished","$doneTodo",color,false),
-                              actionBarItem("Tasks","$totalTodos",color,false),
+                              actionBarItem("onGoing","$ongoingTodo",color,false,20,18),
+                              actionBarItem("Finished","$doneTodo",color,false,20,18),
+                              actionBarItem("Tasks","$totalTodos",color,false,20,18),
                             ],
                           ),
                           Padding(
@@ -143,10 +161,7 @@ class DetailPage extends StatelessWidget {
                       ),
                     );
                   }),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal:60),
-                    child: Divider(color: Theme.of(context).iconTheme.color!.withOpacity(.2),),
-                  ),
+                 
                   Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: Container(decoration:BoxDecoration(
@@ -161,6 +176,11 @@ class DetailPage extends StatelessWidget {
                       horizontal: 3.0.wp,
                     ),
                     child: TextFormField(
+                      style: TextStyle(
+                        fontFamily: "Quick",
+                        fontWeight: FontWeight.bold
+                      ),
+                      textAlignVertical: TextAlignVertical.center,
                       cursorColor: Theme.of(context).iconTheme.color,
                       controller: homeCtrl.editCtrl,
                       decoration: InputDecoration(
@@ -179,16 +199,22 @@ class DetailPage extends StatelessWidget {
                               child: Container(
                                 padding: EdgeInsets.all(6),
                                 decoration: BoxDecoration(
-                                  border: Border.all(color:isFree? Colors.red : Colors.blue),
+                                  border: Border.all(color:isFree?Colors.blue  :Colors.red ),
                                   borderRadius: BorderRadius.circular(15)
                                 ),
-                                child: Text(
-                                  textAlign: TextAlign.center,
-                                  isFree? "No Exp" : "Exp",
-                                style: TextStyle(
-                                  color: isFree? Colors.red : Colors.blue,
-                                  fontFamily:"Quick",
-                                  fontWeight: FontWeight.w600),),
+                                child: Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Icon(isFree?  Icons.star_border:Icons.star ,color:isFree?  Colors.blue:Colors.red ),
+                                    Text(
+                                      textAlign: TextAlign.center,
+                                      isFree?  " Side":" Main" ,
+                                    style: TextStyle(
+                                      color: isFree?  Colors.blue: Colors.red,
+                                      fontFamily:"Quick",
+                                      fontWeight: FontWeight.w600),),
+                                  ],
+                                ),
                               ),
                             ),
                           ),

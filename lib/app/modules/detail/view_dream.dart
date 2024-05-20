@@ -52,47 +52,64 @@ class DreamPage extends StatelessWidget {
                   child: Column(children:[
                     Row(mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Row(
-                        children: [
-                          Container(
-                            padding: const EdgeInsets.all(12),
-                            decoration:BoxDecoration(
-                                            //color: color,
-                                            borderRadius: const BorderRadius.only(
-                                              //topLeft: Radius.circular(10),
-                                              bottomRight: Radius.circular(10))
-                                      ),
-                            child: Icon(
-                              IconData(
-                                task.icon,
-                                fontFamily: 'MaterialIcons',
+                      Padding(
+                        padding: const EdgeInsets.only(left:8.0),
+                        child: Container(padding: EdgeInsets.symmetric(vertical: 12,horizontal: 12),
+                          decoration: 
+                        BoxDecoration(borderRadius: BorderRadius.circular(15)),
+                          child: Row(
+                            children: [
+                              Container(
+                                padding: const EdgeInsets.all(2),
+                                decoration:BoxDecoration(
+                                                borderRadius: const BorderRadius.only(
+                                                  //topLeft: Radius.circular(10),
+                                                  bottomRight: Radius.circular(10))
+                                          ),
+                                child: Icon(
+                                  IconData(
+                                    task.icon,
+                                    fontFamily: 'MaterialIcons',
+                                  ),
+                                  color: color,
+                                ),
                               ),
-                              color: color,
-                            ),
+                               SizedBox(
+                                    width: 3.0.wp,
+                                  ),
+                                  Text(
+                                    task.title,
+                                    style: TextStyle(
+                                      fontFamily: "Quick",
+                                      fontSize: 14.0.sp,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  )
+                            ],
                           ),
-                      SizedBox(
-                        width: 3.0.wp,
-                      ),
-                      Text(
-                        task.title,
-                        style: TextStyle(
-                          fontFamily: "Quick",
-                          fontSize: 14.0.sp,
-                          fontWeight: FontWeight.bold,
                         ),
-                      ),
-                        ],
                       ),
                        Row(
                          children: [
                            //ToDo change that in this case if the user close the app in the create task it wont save
-                           IconButton(
-                             onPressed: () {
-                               Get.back();
-                               homeCtrl.updateTodos();
-                               homeCtrl.editCtrl.clear();
-                             },
-                             icon: const Icon(Icons.close),
+                           Padding(
+                             padding: const EdgeInsets.all(8.0),
+                             child: Container(
+                              padding: EdgeInsets.all(6),
+                              decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              color: color
+                             ),
+                               child: GestureDetector(
+                                 onTap: () {
+                                   Get.back();
+                                   homeCtrl.updateTodos();
+                                   homeCtrl.editCtrl.clear();
+                                   Navigator.popAndPushNamed(context, "HomePage");
+                                 },
+                                 child: const Icon(Icons.close,color: Colors.white,),
+                               ),
+                             ),
                            )
                          ],
                        ),
@@ -113,9 +130,9 @@ class DreamPage extends StatelessWidget {
                         children: [
                            Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                             children: [
-                              actionBarItem("onGoing","$ongoingTodo",color,false),
-                              actionBarItem("Finished","$doneTodo",color,false),
-                              actionBarItem("Tasks","$totalTodos",color,false),
+                              actionBarItem("onGoing","$ongoingTodo",color,false,20,18),
+                              actionBarItem("Finished","$doneTodo",color,false,20,18),
+                              actionBarItem("Tasks","$totalTodos",color,false,20,18),
                             ],
                           ),
                           Padding(
@@ -168,6 +185,11 @@ class DreamPage extends StatelessWidget {
                       horizontal: 3.0.wp,
                     ),
                     child: TextFormField(
+                      style: TextStyle(
+                        fontFamily: "Quick",
+                        fontWeight: FontWeight.bold
+                      ),
+                      textAlignVertical: TextAlignVertical.center,
                       cursorColor: Theme.of(context).iconTheme.color,
                       controller: homeCtrl.editCtrl,
                       decoration: InputDecoration(
@@ -186,16 +208,22 @@ class DreamPage extends StatelessWidget {
                               child: Container(
                                 padding: EdgeInsets.all(6),
                                 decoration: BoxDecoration(
-                                  border: Border.all(color:isFree? Colors.red : Colors.blue),
+                                  border: Border.all(color:isFree?Colors.blue  :Colors.red ),
                                   borderRadius: BorderRadius.circular(15)
                                 ),
-                                child: Text(
-                                  textAlign: TextAlign.center,
-                                  isFree? "No Exp" : "Exp",
-                                style: TextStyle(
-                                  color: isFree? Colors.red : Colors.blue,
-                                  fontFamily:"Quick",
-                                  fontWeight: FontWeight.w600),),
+                                child: Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Icon(isFree?  Icons.star_border:Icons.star ,color:isFree?  Colors.blue:Colors.red ),
+                                    Text(
+                                      textAlign: TextAlign.center,
+                                      isFree?  " Side":" Main" ,
+                                    style: TextStyle(
+                                      color: isFree?  Colors.blue: Colors.red,
+                                      fontFamily:"Quick",
+                                      fontWeight: FontWeight.w600),),
+                                  ],
+                                ),
                               ),
                             ),
                           ),

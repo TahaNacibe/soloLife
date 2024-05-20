@@ -31,7 +31,7 @@ class _PasswordState extends State<Password> {
       style: TextStyle(
         fontFamily: "Quick",
         fontWeight: FontWeight.bold,
-        fontSize: 18
+        fontSize: 16
       ),),),
       body: StatefulBuilder(
         builder: (context,setState) {
@@ -66,7 +66,7 @@ class _PasswordState extends State<Password> {
                               child: Text(
                                 'Create Password',
                                 style: TextStyle(
-                                  fontSize: 20,
+                                  fontSize: 18,
                                   fontFamily: "Quick",
                                   fontWeight: FontWeight.bold,
                                 ),
@@ -75,12 +75,12 @@ class _PasswordState extends State<Password> {
                           ],
                         ),
                                 Padding(
-                                  padding: const EdgeInsets.all(8.0),
+                                  padding: const EdgeInsets.symmetric(horizontal: 6),
                                   child: Text("Password will only lock the Dream Space so activate it to use password",
                                   style: TextStyle(
                                     fontFamily: "Quick",
                                     fontWeight: FontWeight.bold,
-                                    fontSize: 18
+                                    fontSize: 16
                                   ),),
                                 ),
                               ],
@@ -97,6 +97,16 @@ class _PasswordState extends State<Password> {
                     child: inputBar(checkController,"Re-Enter Password"),
                   ),
                   titleBar("Security Question"),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 14),
+                    child: Text(style: TextStyle(
+                      fontFamily: "Quick",
+                      fontWeight: FontWeight.bold,
+                      color: Colors.grey,
+                      fontSize: 12
+                    ),
+                      "If you already have an question you can skip that part no need to update it if you don't want to"),
+                  ),
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 12),
                     child: inputBar(questionController,"question to get password back"),
@@ -123,6 +133,12 @@ class _PasswordState extends State<Password> {
                           user.password = createController.text;
                           user.forgetPassword = "${questionController.text}:${answerController.text}";
                           ProfileProvider().saveProfile(user, "", context);
+                          openMessage = "Password Updated";
+                          Navigator.pop(context);
+                          setState(() {});
+                        }else if(user.forgetPassword.isNotEmpty && questionController.text.isEmpty && answerController.text.isEmpty){
+                        user.password = createController.text;
+                        ProfileProvider().saveProfile(user, "", context);
                           openMessage = "Password Updated";
                           Navigator.pop(context);
                           setState(() {});

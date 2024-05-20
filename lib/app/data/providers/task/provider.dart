@@ -118,12 +118,15 @@ class DailyService{
   List<Daily> tasks =  DailyTasks().readTasks();
 
     void resetUnfinishedTasks(BuildContext context) {
+      Profile user = ProfileProvider().readProfile();
+      int oldStrike = user.strike;
     for (var task in tasks) {
       DateTime now = DateTime.now();
      DateTime timesStamp = DateTime.parse(task.timeStamp);
     // Compare the date components
     if (now.year > timesStamp.year) {
       achievementForMissing(context);
+      //strikeManager(context);
       // a year passed
       timesStamp = DateTime.now();
       task.timeStamp = timesStamp.toIso8601String();
@@ -132,6 +135,7 @@ class DailyService{
       task.isGoing = true;
     } else if (now.year == timesStamp.year && now.month > timesStamp.month) {
       achievementForMissing(context);
+      //strikeManager(context);
       // a month passed
       timesStamp = DateTime.now();
       task.exp = getExpForTheTasks(userInfo.level,task.isFree);
@@ -142,6 +146,7 @@ class DailyService{
         now.month == timesStamp.month &&
         now.day > timesStamp.day) {
           achievementForMissing(context);
+          //strikeManager(context);
           // day passed
           timesStamp = DateTime.now();
           task.exp = getExpForTheTasks(userInfo.level,task.isFree);
@@ -153,6 +158,32 @@ class DailyService{
      // Update the UI with changes
     DailyTasks().writeTasks(tasks); // Save updated tasks to storage
   }
+
+void strikeManager(BuildContext context){
+  if(userInfo.keys!.contains("solo")){
+  DateTime now = DateTime.now();
+  Profile user = ProfileProvider().readProfile();
+  List<Daily> tasksList = DailyTasks().readTasks();
+  bool isSafe = false;
+  DateTime timeStamp = DateTime.parse(tasksList[0].timeStamp);
+  for (Daily task in tasksList) {
+    if(!task.isGoing){
+      isSafe = true;
+      break;
+    }
+  }
+  if (now.year == timeStamp.year &&
+        now.month == timeStamp.month &&
+        now.day > timeStamp.day) {
+  if(isSafe){
+  user.strike += 1;
+  }else{
+    user.strike = 0;
+  }
+  }
+  ProfileProvider().saveProfile(user, "", context);
+  }
+}
 
  /* void achievementForMissing(BuildContext context,DateTime day1, DateTime day2){
     if(day1.difference(day2) > Duration(days: 1)){

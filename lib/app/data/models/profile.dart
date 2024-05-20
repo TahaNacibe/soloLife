@@ -9,7 +9,10 @@ class Profile {
   int voltage;
   int coins;
   String framePath;
+  String coverPath;
+  String pfpPath;
   String forgetPassword;
+  int strike;
   bool haveMessage;
   List<dynamic>? oldJobs;
   List<dynamic>? keys;
@@ -27,11 +30,14 @@ class Profile {
     this.oldJobs,
     this.voltage = 0,
     this.job = "Empty",
+    this.strike = 0,
     this.haveMessage = true,
     this.coins = 0,
     this.keys,
     this.achievements = const[],
     this.framePath = "",
+    this.coverPath = "",
+    this.pfpPath = "",
     this.inventory = const [],
     this.counter = const [
           {'Healer':0},{'Ranger':0},{'Assassin':0},
@@ -55,6 +61,8 @@ class Profile {
     bool? haveMessage,
     int? coins,
     String? framePath,
+    String? pfpPath,
+    String? coverPath,
     List<dynamic>? counter,
     List<dynamic>? inventory,
   }) =>
@@ -67,6 +75,7 @@ class Profile {
         job: job ?? this.job,
         rank: rank ?? this.rank,
         keys: keys ?? this.keys,
+        strike: strike ?? this.strike,
         achievements: achievements ?? this.achievements,
         oldJobs: oldJobs ?? this.oldJobs,
         voltage: voltage ?? this.voltage,
@@ -74,6 +83,8 @@ class Profile {
         haveMessage: haveMessage ?? this.haveMessage,
         counter:counter ?? this.counter,
         framePath: framePath ?? this.framePath,
+        pfpPath: pfpPath ?? this.pfpPath,
+        coverPath: coverPath ?? this.coverPath,
         inventory: inventory ?? this.inventory,
       );
 
@@ -91,6 +102,9 @@ class Profile {
         voltage: json['voltage'] ?? 0,
         coins: json["coins"] ?? 0,
         framePath: json["framePath"] ?? "",
+        strike: json["strike"] ?? 0,
+        coverPath: json["coverPath"] ?? "",
+        pfpPath: json["pfpPath"] ?? "",
         inventory: json['inventory'] ?? [],
         haveMessage: json['haveMessage'] ?? true,
         counter: json['counter'] ?? [
@@ -114,6 +128,9 @@ class Profile {
         'haveMessage':haveMessage,
         'counter':counter,
         'framePath': framePath,
+        'coverPath': coverPath,
+        'pfpPath': pfpPath,
+        'strike': strike,
         'coins': coins,
         'inventory': inventory,
       };

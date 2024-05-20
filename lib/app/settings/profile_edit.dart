@@ -21,6 +21,7 @@ class ProfileInformation extends StatefulWidget {
   Profile user = ProfileProvider().readProfile();
 class _ProfileInformationState extends State<ProfileInformation> {
   late File pfpPath;
+  String globalFrame = "";
   bool isThere = false;
   // ---------------
   late File coverPath;
@@ -30,7 +31,7 @@ class _ProfileInformationState extends State<ProfileInformation> {
   // -------------
   int length = 0;
   // --------------
-  TextEditingController controller = TextEditingController();
+  
     Future<void> _loadImage() async {
     final Directory appDirectory = await getApplicationDocumentsDirectory();
     final String filePath = '${appDirectory.path}/pfp_image.png';
@@ -59,17 +60,14 @@ class _ProfileInformationState extends State<ProfileInformation> {
     final Directory appDirectory = await getApplicationDocumentsDirectory();
     final String filePath = '${appDirectory.path}/cover_image.png';
     if (await File(filePath).exists()) {
-      print("==============yes");
       setState(() {
         coverPath = File(filePath);
         isThereCover = true;
       });
     }else{
-      print("=======================no");
       setState(() {
         coverPath = File("");
         isThereCover = false;
-        print("=========================$isThereCover");
       });
     }
   }
@@ -81,15 +79,11 @@ class _ProfileInformationState extends State<ProfileInformation> {
     coverPath = File(filePath2);
     File pfpPath = File(filePath);
     if(await coverPath.exists()){
-      print("==================true ddddd");
         isThere = true;
     }
     if(await pfpPath.exists()){
-      print("======================true too");
       isThereCover = true;
     }
-        print([coverPath,pfpPath]);
-        print("===================$isThere =========== $isThereCover");
         return [coverPath,pfpPath];
   }
 
@@ -113,16 +107,33 @@ Future<void> _pickImage(ImageSource source,VoidCallback refresh) async {
     refresh();
   }
 }
+Future<void> deleteCoverDirectory(String path) async {
+  String coverDirectoryPath = path;
+  print("============================== action is taking ===============${await Directory(coverDirectoryPath).exists()}");
+  // Check if the directory exists
+  if (await Directory(coverDirectoryPath).exists()) {
+    // Delete the directory and all its contents recursively
+    Directory(coverDirectoryPath).deleteSync(recursive: true);
+    print('Cover directory deleted successfully.');
+  } else {
+    print('${coverDirectoryPath} does not exist.');
+  }
+}
 Future<void> _pickImageCover(ImageSource source,VoidCallback refresh) async {
   final pickedFile = await ImagePicker().pickImage(source: source);
 
   if (pickedFile != null) {
     final File imageFile = File(pickedFile.path);
     final Directory appDirectory = await getApplicationDocumentsDirectory();
-    final String filePath = '${appDirectory.path}/cover_image.png';
-
+    deleteCoverDirectory(user.coverPath);
+    print("======================== action1");
+    final String filePath = '${appDirectory.path}/${DateTime.now()}.jpg';
+    print("======================== action2");
     await imageFile.copy(filePath);
-
+    user.coverPath = filePath;
+    ProfileProvider().saveProfile(user, "", context);
+    print("======================== action3");
+    print("======================== ${user.coverPath}");
       coverPath = File(filePath);
       isThereCover = true; // Update state to indicate that the image is present
     setState(() {
@@ -139,10 +150,11 @@ Future<void> _pickImageCover1(ImageSource source,VoidCallback refresh) async {
   if (pickedFile != null) {
     final File imageFile = File(pickedFile.path);
     final Directory appDirectory = await getApplicationDocumentsDirectory();
-    final String filePath = '${appDirectory.path}/pfp_image.png';
-
+    final String filePath = '${appDirectory.path}/${DateTime.now()}.jpg';
+    deleteCoverDirectory(user.pfpPath);
+    user.pfpPath = filePath;
     await imageFile.copy(filePath);
-
+    ProfileProvider().saveProfile(user, "", context);
       pfpPath = File(filePath);
       isThere = true; // Update state to indicate that the image is present
     setState(() {
@@ -152,31 +164,60 @@ Future<void> _pickImageCover1(ImageSource source,VoidCallback refresh) async {
   }
     refresh;
 }
+
+void getImages() {
+      Profile user = ProfileProvider().readProfile();
+      globalFrame = user.framePath;
+    if(user.coverPath != ""){
+      setState(() {
+        coverPath = File(user.coverPath);
+        isThereCover = true;
+      });
+    }else{
+        setState(() {
+        coverPath = File("");
+        isThereCover = false;
+      });
+    }
+    if(user.pfpPath != ""){
+      setState(() {
+        print("================${user.pfpPath}");
+        pfpPath = File(user.pfpPath);
+        isThere = true;
+      });
+    }else{
+        setState(() {
+        pfpPath = File("");
+        isThere = false;
+      });
+    }
+    }
   @override
   void initState() {
-    _loadImage();
-    _loadCover();
+    //_loadImage();
+    controller.text = user.userName;
+    length = user.userName.characters.length;
+    getImages();
     super.initState();
   }
+  TextEditingController controller = TextEditingController();
   Widget build(BuildContext context,) {
-    controller.text = user.userName;
+    
     Widget cover(bool isThereCover,File path){
-      if(isThereCover) {
+      if(user.coverPath != "") {
 
-         print("===============yes2");
             
             return Container(
-              height: 220,
+              height: 250,
               width: MediaQuery.sizeOf(context).width,
               child: Image.file(path,fit: BoxFit.cover,));
 
       }else{
-        print("========================no2");
         return Container(
           decoration: BoxDecoration(
             borderRadius: BorderRadius.vertical(bottom: Radius.circular(15))
           ),
-          height: 220,
+          height: 250,
           width: MediaQuery.sizeOf(context).width,
           child: Image.asset(
             'assets/images/giphy.gif',
@@ -186,6 +227,12 @@ Future<void> _pickImageCover1(ImageSource source,VoidCallback refresh) async {
     }
     return Scaffold(
       appBar: AppBar(
+        actions: [
+          
+        ],
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(bottom: Radius.circular(50))
+        ),
         leading: GestureDetector(
           onTap:(){
             Navigator.popAndPushNamed(context, "HomePage");
@@ -195,39 +242,24 @@ Future<void> _pickImageCover1(ImageSource source,VoidCallback refresh) async {
         title: Text( "Profile Information",style: TextStyle(fontFamily: "Quick",fontWeight: FontWeight.bold),),
       ),
       body: PopScope(
-        canPop: false,
-        onPopInvoked: (didPop) async {
+         canPop: false,
+ onPopInvoked: (didPop) async {
   if (didPop) {
     return;
-  }else{
-    Navigator.popAndPushNamed(context, "HomePage");
   }
-        },
-        child: StatefulBuilder(
-          builder: (context,setState) {
-            return StreamBuilder(
-              stream: loadCoverNow().asStream(),
-              builder: (context,snapshot) {
-                
-                if(snapshot.connectionState == ConnectionState.waiting || snapshot.data == null){
-                  return Container();
-                }else if(snapshot.connectionState == ConnectionState.done){
-                  File coverImage = snapshot.data![1];
-                File pfpImage = snapshot.data![0];
-                bool isThereCover = coverImage.existsSync();
-      bool isThere = pfpImage.existsSync();
-                print("===================isther cover ===========$isThereCover");
-                return ListView(
+  Navigator.popAndPushNamed(context, "HomePage");
+  },
+        child: ListView(
                   children: [
                     Container(
-                      height: 280,
+                      height: 270,
                       child: Stack(
                         children: [
                        Container(
                             
                         child: Stack(
                           children: [
-                            cover(isThereCover,coverImage),
+                            cover(isThereCover,coverPath),
                             Padding(
                               padding: const EdgeInsets.all(8.0),
                               child: GestureDetector(
@@ -266,7 +298,7 @@ Future<void> _pickImageCover1(ImageSource source,VoidCallback refresh) async {
                                             decoration: BoxDecoration(
                                               border: Border.all(
                                                 width: 5,
-                                                color:frame != ""? Colors.transparent :Colors.black,),
+                                                color:globalFrame != ""? Colors.transparent :Colors.black,),
                                               shape: BoxShape.circle
                                             ),
                                             
@@ -274,18 +306,19 @@ Future<void> _pickImageCover1(ImageSource source,VoidCallback refresh) async {
                                                 
                                                         radius: 65,
                                                         backgroundImage: isThere
-                                                            ? FileImage(pfpImage)
+                                                            ? FileImage(pfpPath)
                                                             : AssetImage('assets/images/giphy.gif') as ImageProvider,
                                                              ),
                                             ),
                                           ),
                                            //? the Rank budget 
-                                           if(frame != "")
-                                        Image.asset(frame,width: 165, height:150,fit: BoxFit.cover, ),
+                                           if(globalFrame != "")
+                                        Image.asset(globalFrame,width: 165, height:150,fit: BoxFit.cover, ),
                                             
                                         ],
                                       ),
                         ),
+                        
                       ],),
                     ),
                     Padding(
@@ -300,9 +333,13 @@ Future<void> _pickImageCover1(ImageSource source,VoidCallback refresh) async {
                               });});
                               setState((){});
                              }),
+                            //Container(),
                         button("Change Frame", () {
-                          bottomSheet((){setState(() {
-                            
+                          bottomSheet(
+                            (){
+                            user.framePath = globalFrame;
+                            ProfileProvider().saveProfile(user, "", context);
+                              setState(() {
                           });});
                          }),
                           ],
@@ -336,16 +373,17 @@ Future<void> _pickImageCover1(ImageSource source,VoidCallback refresh) async {
                             ),
                             child: TextField(
                               onChanged: (controller){
-                                
+                                length = controller.characters.length;
+                                setState((){});
                               },
                               controller: controller,
-                              maxLength: 10,
+                              maxLength: 15,
                               decoration: InputDecoration(
                                 counter: 
                                   Offstage(),
                                   suffix: Padding(
                                     padding: const EdgeInsets.only(right:8.0),
-                                    child: Text("/10",
+                                    child: Text("$length/15",
                                     style: TextStyle(
                                       fontSize: 14,
                                     color: Theme.of(context).iconTheme.color!.withOpacity(.4),),),
@@ -365,52 +403,53 @@ Future<void> _pickImageCover1(ImageSource source,VoidCallback refresh) async {
                       style: TextStyle(fontFamily: "Quick",fontWeight: FontWeight.bold,color: Theme.of(context).iconTheme.color!.withOpacity(.5)),),
                     ),
                     SizedBox(height: 100,),
-                    Align(alignment: Alignment.bottomCenter,
-                      child: GestureDetector(
-                        onTap: (){
-                          user.userName = controller.text;
-                          ProfileProvider().saveProfile(user, "",context);
-                          Navigator.popAndPushNamed(context, "HomePage");
-                        },
-                        child: Container(
-                          padding: EdgeInsets.symmetric(horizontal: 100,vertical: 14),
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(15),
-                            color: Colors.indigo
-                          ),
-                          child: Text("Save",
-                          style: TextStyle(
-                            fontFamily: "Quick",
-                            fontWeight: FontWeight.bold,
-                            fontSize: 18,
-                            color: Colors.white),)),
-                      ))
-                  ],);
-                }else{
-                  return Container();
-                }
-              }
-            );
-          }
-        ),
-      ),
+                    Padding(
+                      padding: const EdgeInsets.only(bottom:8.0),
+                      child: Align(alignment: Alignment.bottomCenter,
+                        child: GestureDetector(
+                          onTap: (){
+                            user.userName = controller.text;
+                            user.framePath = globalFrame;
+                            ProfileProvider().saveProfile(user, "",context);
+                            Navigator.popAndPushNamed(context, "HomePage");
+                          },
+                          child: Container(
+                            padding: EdgeInsets.symmetric(horizontal: 80,vertical: 14),
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(15),
+                              color: Colors.indigo
+                            ),
+                            child: Text("Change Name",
+                            style: TextStyle(
+                              fontFamily: "Quick",
+                              fontWeight: FontWeight.bold,
+                              fontSize: 15,
+                              color: Colors.white),)),
+                        )),
+                    )
+                  ],),
+      )
     );
   }
   Widget button(String title,void Function() onTap){
     return GestureDetector(
       onTap: onTap,
-      child: Container(
-        padding: EdgeInsets.symmetric(horizontal: 30,vertical: 12),
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(10),
-          color: Colors.indigo.withOpacity(.3),
-        ),
-        child: Text(title,
-        style: TextStyle(
-          fontFamily: "Quick",
-          //color: Colors.indigo,
-          fontSize: 16,
-          fontWeight: FontWeight.bold,),),
+      child: Row(
+        children: [
+          Container(
+            padding: EdgeInsets.symmetric(horizontal: 22,vertical: 12),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(10),
+              color: Colors.indigo.withOpacity(.3),
+            ),
+            child: Text(title,
+            style: TextStyle(
+              fontFamily: "Quick",
+              //color: Colors.indigo,
+              fontSize: 16,
+              fontWeight: FontWeight.bold,),),
+          ),
+        ],
       ),
     );
   }
@@ -421,8 +460,10 @@ Future<void> _pickImageCover1(ImageSource source,VoidCallback refresh) async {
     .where((entry) => user.inventory.contains(entry.key) && entry.value.itemType == "frame")
     .map((entry) => entry.value)
     .toList();*/
-    List<dynamic> ids = user.inventory.where((element) => element.contains("Frame")).toList();
+    List<dynamic> ids = user.inventory.where((element) => (element.contains("Frame") && archive[element] != null)).toList();
     showModalBottomSheet(
+      barrierColor: Colors.transparent,
+      elevation: 10,
       context: context, 
       builder: (BuildContext context){
         if(ids.isEmpty){
@@ -439,78 +480,102 @@ Future<void> _pickImageCover1(ImageSource source,VoidCallback refresh) async {
               ),),),
           );
         }else{
-        return Container(
-          padding: EdgeInsets.all(8),
-          child: GridView.builder(
-            shrinkWrap: true,
-            itemCount: ids.length,
-            gridDelegate:
-                SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: 3),
-            itemBuilder: (context, index) {
-              String pathFrame = user.framePath;
-              // get the item and its count at the current index
-              String itemId = ids[index];
-          
-              // find the corresponding item in the archive
-              ShopItem item = archive[itemId];
-          
-              // build the widget for the item
-              return Padding(
-                padding: const EdgeInsets.all(4),
-                child: 
-                itemData(item.title, item.image, () {
-            user.framePath = item.image;
-            ProfileProvider().saveProfile(user, "",context);
-            refresh;
-            Navigator.pop(context);
-                },item.rarity,item.image,pathFrame),
-              );
-            },
-          ),
+        return StatefulBuilder(
+          builder: (context,setState) {
+            return Container(
+              padding: EdgeInsets.all(12),
+              child: SingleChildScrollView(
+        
+                child: Column(
+                  children: [
+                    Text("Choose a New Frame",style: TextStyle(
+                  fontFamily: "Quick",
+                  fontWeight: FontWeight.bold,
+                  fontSize: 21)),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 40,vertical: 8),
+                    child: Divider(),
+                  ),
+                    GridView.builder(
+                      physics: NeverScrollableScrollPhysics(),
+                      shrinkWrap: true,
+                      itemCount: ids.length,
+                      gridDelegate:
+                          SliverGridDelegateWithFixedCrossAxisCount(
+                            mainAxisSpacing: 12,
+                            crossAxisSpacing: 12,
+                            childAspectRatio: 1,
+                    crossAxisCount: 3),
+                      itemBuilder: (context, index) {
+                        String pathFrame = user.framePath;
+                        // get the item and its count at the current index
+                        String itemId = ids[index];
+                    
+                        // find the corresponding item in the archive
+                        ShopItem item = archive[itemId];
+                    
+                        // build the widget for the item
+                        return Padding(
+                          padding: const EdgeInsets.all(4),
+                          child: 
+                          GestureDetector(
+                            onTap:() {
+                              //Profile user = ProfileProvider().readProfile();
+                                        globalFrame = item.image;
+                                        
+                                        
+                                        //print("---------- cover ----------------${user.framePath}");
+                                        //ProfileProvider().saveProfile(user, "",context);
+                                        //Profile user1 = ProfileProvider().readProfile();
+                                        print("--- -------- --------- -------- 2 ---- ${globalFrame}");
+                                        setState((){});
+                                        refresh();
+                                        //Navigator.pop(context);
+                            },
+                            child: Stack(
+                              children: [
+                                itemData(item.title, item.image,item.rarity,item.image,pathFrame),
+                              if(item.image == globalFrame)
+                    Container(
+                      padding: EdgeInsets.symmetric(vertical: 8,horizontal: 8),
+                      decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(12),
+                      color: Colors.indigo.withOpacity(.85)
+                    ),child: Icon(Icons.done,color: Colors.white,),)
+                              ],
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                  ],
+                ),
+              ),
+            );
+          }
         );
         }
       });
   }
 
-  Widget itemData(String name, String image, void Function() onTap,int rarity,String path,String pathFrame){
-    return GestureDetector(
-      onTap:
-          onTap,
-      child: Stack(
-        children: [
-          Container(
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(15),
-              border: Border.all(color:Colors.indigo),
-              color: Theme.of(context).cardColor,
-              boxShadow:[BoxShadow(
-                color: Theme.of(context).shadowColor, // Shadow color
-                spreadRadius: 1, // Extends the shadow beyond the box
-                blurRadius: 5, // Blurs the edges of the shadow
-                offset: const Offset(0, 3), // Moves the shadow slightly down and right
-                )]
-            ),
-            child: Stack(alignment: Alignment.topRight,
-              children: [
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Image.asset(image),
-                ),
-                //Divider(),
-                if(pathFrame == path)
-                Container(
-                  padding: EdgeInsets.symmetric(vertical: 10,horizontal: 10),
-                  decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: Colors.indigo
-                ),child: Icon(Icons.done,color: Colors.white,),)
-              ],
-            )),
-            
-        ],
+  Widget itemData(String name, String image,int rarity,String path,String pathFrame){
+    return Container(
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(15),
+        border: Border.all(color:Colors.indigo.withOpacity(.3)),
+        color: Colors.indigo.withOpacity(.15),
+        
       ),
-    );
+      child: Stack(alignment: Alignment.topRight,
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(4),
+            child: Image.asset(image),
+          ),
+          //Divider(),
+          
+        ],
+      ));
   }
 }
 

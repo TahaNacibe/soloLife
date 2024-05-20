@@ -23,7 +23,8 @@ class TaskCard extends StatelessWidget {
             onTap: () {
               homeCtrl.changeTask(task);
               homeCtrl.changeTodos(task.todos ?? []);
-              Get.to(() => DetailPage());
+              //Get.to(() => DetailPage());
+              Navigator.popAndPushNamed(context, "DetailPage");
             },
             child: Container(
               width: squareWidth / 2,

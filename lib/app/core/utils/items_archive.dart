@@ -16,10 +16,8 @@ Map<String, dynamic> archive = {
   //? items type Frames
     "TaiShiFrame":ShopItem(title:"art Frame",image:"assets/images/frames/shi.png", price: 500,itemType: "frame", id: "TaiShiFrame",rarity:3),
   "Kitsunee" :ShopItem(title:"Kitsunee Frame",image:"assets/images/frames/limited.png", price: 0,itemType: "frame",id:"Kitsunee",rarity: 3),
-   "FoxFrame":ShopItem(title:"Fox Frame",image:"assets/images/frames/fox.png", price: 500,itemType: "frame",id:"FoxFrame",rarity:3),
   "GoldFrame1":ShopItem(title:"Gold1 Frame",image:"assets/images/frames/gold1.png", price: 0,itemType: "frame",id:"GoldFrame1",rarity:3),
   "GoldFrame2":ShopItem(title:"Gold2 Frame",image:"assets/images/frames/gold2.png", price: 500,itemType: "frame",id:"GoldFrame2",rarity:3),
-  "DemonFrame":  ShopItem(title:"Demon Frame",image:"assets/images/frames/demon.png", price: 500,itemType: "frame",id:"DemonFrame",rarity:3),
   "MoonFrame":ShopItem(title:"Moon Frame",image:"assets/images/frames/moon.png", price: 500,itemType: "frame",id:"MoonFrame",rarity:4),
   "CloudFrame":ShopItem(title:"Cloud Frame",image:"assets/images/frames/cloud.png", price: 0,itemType: "frame", id: "CloudFrame",rarity:4),
   "NovFrame":  ShopItem(title:"Novilat Frame",image:"assets/images/frames/novilat.png", price: 500,itemType: "frame",id:"NovFrame",rarity:4),

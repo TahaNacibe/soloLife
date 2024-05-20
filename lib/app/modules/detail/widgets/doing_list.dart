@@ -1,5 +1,7 @@
 import 'package:SoloLife/app/core/utils/extensions.dart';
 import 'package:SoloLife/app/core/utils/icon_pack_icons.dart';
+import 'package:SoloLife/app/data/models/profile.dart';
+import 'package:SoloLife/app/data/providers/task/provider.dart';
 import 'package:SoloLife/app/modules/home/controller.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -10,27 +12,36 @@ import 'package:get/get.dart';
 class DoingList extends StatelessWidget {
   final homeCtrl = Get.find<HomeController>();
   DoingList({super.key});
-
+  bool isOrdering = false;
+  int indexFor = 999999999;
   @override
   Widget build(BuildContext context) {
+    Profile user = ProfileProvider().readProfile();
+  var task = homeCtrl.task.value!;
+    var color = HexColor.fromHex(task.color);
     return Obx(
       () => homeCtrl.doingTodos.isEmpty && homeCtrl.doneTodos.isEmpty
           ? Column(
               children: [
                 SizedBox(height: 6.0.wp),
-                Image.asset(
-                  'assets/images/list.png',
-                  fit: BoxFit.cover,
-                  width: 65.0.wp,
-                ),
+                Text(
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontFamily: "Quick",
+                    fontWeight: FontWeight.bold,
+                    fontSize: 30
+                  ),
+                  "Why its' too empty here ?\n"),
                 SizedBox(height: 6.0.wp),
                 Text(
-                  'Add Task',
+                  textAlign: TextAlign.center,
                   style: TextStyle(
+                    fontFamily: "Quick",
                     fontWeight: FontWeight.bold,
-                    fontSize: 16.0.sp,
+                    color:color,
+                    fontSize: 30
                   ),
-                ),
+                  "(0o0?)"),
                 
               ],
             )
@@ -69,16 +80,7 @@ class DoingList extends StatelessWidget {
                     ),
               StatefulBuilder(
                 builder: (context,setState) {
-                  bool isOrdering = false;
                   return ReorderableListView(
-                    onReorderStart: (_){
-                      isOrdering = true;
-                      setState((){});
-                    },
-                    onReorderEnd: (_){
-                      isOrdering = false;
-                      setState((){});
-                    },
                     onReorder: (oldIndex, newIndex) {
                   setState(() {
                     if (newIndex > oldIndex) {
@@ -89,6 +91,17 @@ class DoingList extends StatelessWidget {
                     homeCtrl.doingTodos.refresh();
                   });
                 },
+                proxyDecorator: (Widget child, int index, Animation<double> animation) {
+      return Material(
+        child: Container(
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(15),
+            border: Border.all(color: Colors.black, width: 1.5)
+          ),
+          child: child,
+        ),
+      );
+    },
                       shrinkWrap: true,
                       physics: const ClampingScrollPhysics(),
                       children: [
@@ -102,7 +115,7 @@ class DoingList extends StatelessWidget {
                                                         color: Theme.of(context).cardColor,
                                                         boxShadow:[
                                                         BoxShadow(
-                                                        color:isOrdering? Colors.transparent: Theme.of(context).shadowColor, // Shadow color
+                                                        color:Theme.of(context).shadowColor, // Shadow color
                                                         spreadRadius: 2, // Extends the shadow beyond the box
                                                         blurRadius: 5, // Blurs the edges of the shadow
                                                         offset: const Offset(0, 3), // Moves the shadow slightly down and right
@@ -135,6 +148,7 @@ class DoingList extends StatelessWidget {
                                           horizontal: 2.0.wp,
                                         ),
                                         child: ListTile(
+                                          trailing: Icon(Icons.menu,size: 30,),
                                           leading: Container(
                                             decoration: BoxDecoration(
                                               shape: BoxShape.circle,
@@ -146,9 +160,11 @@ class DoingList extends StatelessWidget {
                                                         
                                                         value: element['done'],
                                                         onChanged: (value) {
-                                                          element['coins'] = element['coins'] ?? 10;
+                                                          element['coins'] = element['coins'] ?? 0;
                                                           print(element);
                                                           homeCtrl.doneTodo(element['title'],element["exp"], element['coins'],context);
+                                                          homeCtrl.updateTodos();
+                                                          
                                                         },
                                                       ),
                                                     ),
@@ -278,26 +294,33 @@ class DoingList extends StatelessWidget {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       mainAxisSize: MainAxisSize.min,
                       children: <Widget>[
-                        Text.rich(TextSpan(
-                          style: TextStyle(
-                            fontFamily: "Quick",
-                            fontWeight: FontWeight.bold,
-                            fontSize: 18
-                          ),
-                          children:[
-                          TextSpan(
-                            text: "Want to delete ",
-                          ),
-                          TextSpan(
-                            text: "${element['title']} ",
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 8),
+                          child: Text.rich(
+                            maxLines: 3,
+                            overflow: TextOverflow.ellipsis,
+                            textAlign: TextAlign.center,
+                            TextSpan(
                             style: TextStyle(
-                              color: Colors.red
+                              fontFamily: "Quick",
+                              fontWeight: FontWeight.bold,
+                              fontSize: 18
+                            ),
+                            children:[
+                            TextSpan(
+                              text: "Want to delete ",
+                            ),
+                            TextSpan(
+                              text: "${element['title']} ",
+                              style: TextStyle(
+                                color: Colors.red
+                              )
+                            ),
+                            TextSpan(
+                              text: "?\n"
                             )
-                          ),
-                          TextSpan(
-                            text: "?\n"
-                          )
-                        ])),
+                          ])),
+                        ),
                         Text("You wont get any Exp or Credit if you delete it",
                         style: TextStyle(fontFamily: "Quick",fontWeight: FontWeight.w600),),
                         SizedBox(height: 20),

@@ -14,7 +14,7 @@ Widget limit(){
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       fontFamily: "Quick",
-                      fontSize: 22,
+                      fontSize: 20,
                       fontWeight: FontWeight.bold
                     ),
                     TextSpan(children: [
@@ -32,9 +32,10 @@ Widget over(){
   return  Padding(
              padding: const EdgeInsets.all(12),
              child: Text.rich(
+              textAlign: TextAlign.center,
               style: TextStyle(
                 fontFamily: "Quick",
-                fontSize: 22,
+                fontSize: 20,
                 fontWeight: FontWeight.bold
               ),
               TextSpan(children: [
@@ -49,9 +50,10 @@ Widget you(){
   return  Padding(
              padding: const EdgeInsets.all(12),
              child: Text.rich(
+              textAlign: TextAlign.center,
               style: TextStyle(
                 fontFamily: "Quick",
-                fontSize: 22,
+                fontSize: 20,
                 fontWeight: FontWeight.bold
               ),
               TextSpan(children: [
@@ -66,9 +68,10 @@ Widget showThem(){
   return  Padding(
              padding: const EdgeInsets.all(12),
              child: Text.rich(
+              textAlign: TextAlign.center,
               style: TextStyle(
                 fontFamily: "Quick",
-                fontSize: 22,
+                fontSize: 20,
                 fontWeight: FontWeight.bold
               ),
               TextSpan(children: [
@@ -83,9 +86,10 @@ Widget loose(){
   return  Padding(
              padding: const EdgeInsets.all(12),
              child: Text.rich(
+              textAlign: TextAlign.center,
               style: TextStyle(
                 fontFamily: "Quick",
-                fontSize: 22,
+                fontSize: 20,
                 fontWeight: FontWeight.bold
               ),
               TextSpan(children: [
@@ -100,9 +104,10 @@ Widget lesson(){
   return  Padding(
              padding: const EdgeInsets.all(12),
              child: Text.rich(
+              textAlign: TextAlign.center,
               style: TextStyle(
                 fontFamily: "Quick",
-                fontSize: 22,
+                fontSize: 20,
                 fontWeight: FontWeight.bold
               ),
               TextSpan(children: [
@@ -117,9 +122,10 @@ Widget lesson2(){
   return  Padding(
              padding: const EdgeInsets.all(12),
              child: Text.rich(
+              textAlign: TextAlign.center,
               style: TextStyle(
                 fontFamily: "Quick",
-                fontSize: 22,
+                fontSize: 20,
                 fontWeight: FontWeight.bold
               ),
               TextSpan(children: [
@@ -134,14 +140,14 @@ Widget level(){
   return  Padding(
                padding: const EdgeInsets.all(12),
                child: Text.rich(
+                textAlign: TextAlign.center,
                TextSpan(children:[
                 TextSpan(text:  "Ready For The Next ",style: TextStyle()),
                 TextSpan(text: "Level ?",style: TextStyle(color:Colors.purple)),
                 TextSpan(text: "",style: TextStyle())]),
-                textAlign: TextAlign.center,
                 style: TextStyle(
                   fontWeight: FontWeight.bold,
-                  fontSize: 22,
+                  fontSize: 20,
                   fontFamily: "Quick"),),
              );
 }

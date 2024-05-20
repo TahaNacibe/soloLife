@@ -51,10 +51,11 @@ class AddCard extends StatelessWidget {
                         border: Border.all(color: Theme.of(context).iconTheme.color!.withOpacity(.2),width: 1.5)
                       ),
                         child: TextFormField(
+                          style: TextStyle(fontFamily: "Quick",fontWeight: FontWeight.bold,),
                           cursorColor: Theme.of(context).iconTheme.color,
                           controller: homeCtrl.editCtrl,
                           decoration:  InputDecoration(
-                            contentPadding: EdgeInsets.only(left:8),
+                            contentPadding: EdgeInsets.only(left:12,bottom: 12),
                              border: InputBorder.none,
                             labelText: 'Collection name',
                             labelStyle: TextStyle(fontFamily: "Quick",fontWeight: FontWeight.w500,)

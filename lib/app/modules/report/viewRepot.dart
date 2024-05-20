@@ -334,10 +334,6 @@ class ReportPage extends StatelessWidget {
                             style: TextStyle(fontFamily: "Quick",
                             fontSize: 16,
                             fontWeight: FontWeight.bold),),
-                            Text("${user.coins} Runes ",
-                            style: TextStyle(fontFamily: "Quick",
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold),),
                           ],
                         ),
                       )

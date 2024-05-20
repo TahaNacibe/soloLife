@@ -8,7 +8,7 @@ void levelUpDialog(BuildContext context) {
   int currentSteps = 0;
   Profile user = ProfileProvider().readProfile();
   showDialog(
-    barrierDismissible: false,
+    barrierDismissible: true,//! when did i change that !!
     context: context,
     builder: (BuildContext context) {
       return StatefulBuilder(
