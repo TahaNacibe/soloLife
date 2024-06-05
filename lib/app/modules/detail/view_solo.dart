@@ -1,14 +1,12 @@
 import 'package:SoloLife/app/core/utils/extensions.dart';
 import 'package:SoloLife/app/core/utils/icon_pack_icons.dart';
-import 'package:SoloLife/app/data/models/achivments.dart';
+import 'package:SoloLife/app/data/models/achievements.dart';
 import 'package:SoloLife/app/data/models/solo.dart';
 import 'package:SoloLife/app/data/providers/task/provider.dart';
 import 'package:SoloLife/app/data/services/expScal/exp.dart';
 import 'package:SoloLife/app/data/services/voiceCommand/service.dart';
 import 'package:SoloLife/app/modules/home/widgets/user_info_card.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:get/get.dart';
 import 'package:step_progress_indicator/step_progress_indicator.dart';
@@ -23,11 +21,16 @@ class SoloDetail extends StatefulWidget {
 }
 
 class _SoloDetailState extends State<SoloDetail> {
+  
+  // Initializing variables
   final TextEditingController titleController = TextEditingController();
   List<Daily> tasks = DailyTasks().readTasks();
   bool isFree = false;
+
   @override
   Widget build(BuildContext context) {
+
+    // Initializing variables
     int level = userInfo.level;
     List<Daily> finished = tasks.where((task) => !task.isGoing).toList();
     List<Daily> onGoing = tasks.where((task) => task.isGoing).toList();
@@ -36,6 +39,7 @@ class _SoloDetailState extends State<SoloDetail> {
     }
 
     final RxInt totalTodos = tasks.length.obs;
+    // adding tasks using this as direct actions
     void addTask(
         String title, bool free, int getExp, String time, int getCoins) {
       tasks.add(Daily(
@@ -236,6 +240,7 @@ class _SoloDetailState extends State<SoloDetail> {
                           ),
                           suffixIcon: IconButton(
                             onPressed: () {
+                              // adding the tasks here
                               String title = titleController.text;
                               if (title.isNotEmpty) {
                                 int point =
@@ -857,7 +862,7 @@ class _SoloDetailState extends State<SoloDetail> {
       ),
     );
   }
-
+// bottom sheet for the delete 
   void bottomShit(
       BuildContext context, Daily element, void Function() refresh) {
     showModalBottomSheet(

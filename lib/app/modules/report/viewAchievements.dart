@@ -1,8 +1,7 @@
 import 'package:SoloLife/app/core/utils/icon_pack_icons.dart';
-import 'package:SoloLife/app/data/models/achivments.dart';
+import 'package:SoloLife/app/data/models/achievements.dart';
 import 'package:SoloLife/app/data/models/profile.dart';
 import 'package:SoloLife/app/data/providers/task/provider.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:step_progress_indicator/step_progress_indicator.dart';
 
@@ -15,6 +14,7 @@ class AchievementsPage extends StatefulWidget {
 }
 
 class _AchievementsPageState extends State<AchievementsPage> {
+  // initialize the vars
   Profile user = ProfileProvider().readProfile();
   late ScrollController _scrollController;
 
@@ -22,13 +22,11 @@ class _AchievementsPageState extends State<AchievementsPage> {
   void initState() {
     super.initState();
     _scrollController = ScrollController();
-
+    // check for the scroll to item
     if (widget.title != "") {
-      print("==========okay");
       final index = achievementsArchive.values
           .toList()
           .indexWhere((item) => item.title == widget.title);
-      print("==========================$index");
       // Scroll to the specific item after the first frame
       WidgetsBinding.instance.addPostFrameCallback((_) {
         _scrollToItem(index);
@@ -36,10 +34,10 @@ class _AchievementsPageState extends State<AchievementsPage> {
     }
   }
 
+// get the item location based on it's index
   void _scrollToItem(int index) {
-    print("========================================$index");
     index = index > 52 ? 52 : index;
-    double position = index * 110.0; // Assuming each item has a fixed height
+    double position = index * 115.0; // Assuming each item has a fixed height
     _scrollController.animateTo(
       position,
       duration: Duration(seconds: 1),
@@ -47,6 +45,7 @@ class _AchievementsPageState extends State<AchievementsPage> {
     );
   }
 
+// remove the controller
   @override
   void dispose() {
     _scrollController.dispose();
@@ -55,9 +54,11 @@ class _AchievementsPageState extends State<AchievementsPage> {
 
   @override
   Widget build(BuildContext context) {
+    // initialize the vars
     List<dynamic> yourAchievements = user.achievements;
     List<dynamic> achievements = achievementsArchive.values.toList();
     int percent = (yourAchievements.length * 100) ~/ achievements.length;
+
     return Scaffold(
       appBar: AppBar(
         title: Text(
@@ -161,7 +162,7 @@ class _AchievementsPageState extends State<AchievementsPage> {
                 shrinkWrap: true,
                 itemCount: achievements.length,
                 itemBuilder: (context, index) {
-                  Achievements item = achievements[index]!;
+                  brief item = achievements[index]!;
                   bool isOpen = yourAchievements.contains(item.id);
                   bool isHidden = item.isHidden;
                   if (isHidden && !isOpen) {
@@ -179,15 +180,6 @@ class _AchievementsPageState extends State<AchievementsPage> {
 
   Widget achievementItem(
       String title, int rarity, String description, bool isOpen) {
-    String prize = rarity == 7
-        ? "15K"
-        : rarity == 6
-            ? "5k"
-            : rarity == 5
-                ? "1k"
-                : rarity == 4
-                    ? "500"
-                    : "250";
     Color color = rarity == 7
         ? Colors.purple
         : rarity == 6
@@ -273,7 +265,6 @@ class _AchievementsPageState extends State<AchievementsPage> {
       child: Stack(
         alignment: Alignment.centerLeft,
         children: [
-          //color: Theme.of(context).iconTheme.color!.withOpacity(.5),
           Divider(),
           Container(
               padding: EdgeInsets.all(8),

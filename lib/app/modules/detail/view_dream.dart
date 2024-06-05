@@ -15,15 +15,17 @@ class DreamPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+
+    // Initializing variables
     var task = homeCtrl.task.value!;
     bool isClosed = true;
     bool isFree = false;
     String userPassword = ProfileProvider().readProfile().password;
     bool isLocked = userPassword.isNotEmpty;
-
-    TextEditingController controller = TextEditingController();
     String message = "";
     var color = HexColor.fromHex(task.color);
+    // Initializing controller
+    TextEditingController controller = TextEditingController();
     return 
        StatefulBuilder(
         builder: (context,setState) {
@@ -116,10 +118,13 @@ class DreamPage extends StatelessWidget {
                     ],
                   ),
                   Obx(() {
+                    // Initializing variables for observation of the obx
                     var totalTodos =
                         homeCtrl.doingTodos.length + homeCtrl.doneTodos.length;
                     var ongoingTodo = homeCtrl.doingTodos.length;
                     var doneTodo = homeCtrl.doneTodos.length; 
+
+                    // the Ui
                     return Padding(
                       padding: EdgeInsets.only(
                         left: 14.0.wp,
@@ -245,7 +250,6 @@ class DreamPage extends StatelessWidget {
                             icon: Container(padding: const EdgeInsets.all(12),
                             decoration:BoxDecoration(
                       color: color,
-                      //shape: BoxShape.circle
                       borderRadius: BorderRadius.circular(10)
                                       ),
                               child: const Icon(Icons.add,color:Colors.white)),
@@ -276,8 +280,7 @@ class DreamPage extends StatelessWidget {
           ],
         ),
       ),
-                      
-              
+                      // check if the password exit
               if(isClosed && isLocked)
               Container(
                 color: Theme.of(context).cardColor,
@@ -293,13 +296,7 @@ class DreamPage extends StatelessWidget {
                       )]
                       ),
                 child: Column(
-                  
-                  children:[Row(
-                    children: [
-                      
-                      
-                    ],
-                  ),
+                  children:[
                   const SizedBox(height: 100,),
                   CircleAvatar(
                     backgroundColor: color,

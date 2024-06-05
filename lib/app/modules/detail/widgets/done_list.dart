@@ -1,6 +1,5 @@
 import 'package:SoloLife/app/core/utils/extensions.dart';
 import 'package:SoloLife/app/core/utils/icon_pack_icons.dart';
-import 'package:SoloLife/app/core/values/colors.dart';
 import 'package:SoloLife/app/modules/home/controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';

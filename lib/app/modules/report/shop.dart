@@ -1,12 +1,11 @@
+import 'dart:async';
 import 'package:SoloLife/app/core/utils/icon_pack_icons.dart';
 import 'package:SoloLife/app/core/utils/items_archive.dart';
-import 'package:SoloLife/app/data/models/achivments.dart';
+import 'package:SoloLife/app/data/models/achievements.dart';
 import 'package:SoloLife/app/data/models/profile.dart';
 import 'package:SoloLife/app/data/models/shopItem.dart';
 import 'package:SoloLife/app/data/providers/task/provider.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 
 class Shop extends StatefulWidget {
   const Shop({super.key});
@@ -15,8 +14,11 @@ class Shop extends StatefulWidget {
   State<Shop> createState() => _ShopState();
 }
 
-Profile user = ProfileProvider().readProfile();
-List<dynamic> items = archive.values.toList();
+List<dynamic> todayListIds = ProfileProvider().readProfile().todayShop;
+List<dynamic> items = archive.values
+    .toList()
+    .where((element) => todayListIds.contains(element.id))
+    .toList();
 List<dynamic> frames =
     items.where((element) => element.itemType == "frame").toList();
 List<dynamic> runes =
@@ -27,30 +29,57 @@ List<dynamic> box =
 //final Profile user = ProfileProvider().readProfile();
 
 class _ShopState extends State<Shop> {
-  int coins = user.coins;
+  int coins = 0;
+  String _timeDifference = "";
   @override
   void initState() {
     Profile user2 = ProfileProvider().readProfile();
     coins = user2.coins;
+    if(mounted){
+
+    _calculateTimeDifference();
+    }
     super.initState();
   }
 
   bool show = false;
+  void _calculateTimeDifference() {
+    Timer.periodic(Duration(seconds: 1), (_) {
+      DateTime now = DateTime.now();
+      DateTime midnight = DateTime(now.year, now.month, now.day + 1);
+      Duration difference = midnight.difference(now);
+      // Extract hours and minutes
+      int hours = difference.inHours;
+      int minutes = difference.inMinutes.remainder(60);
+      setState(() {
+        _timeDifference = '${hours}h ${minutes}m';
+      });
+    });
+  }
 
   // get user data as var user
   int infoIndexRune = 99999;
   int infoIndexBox = 99999;
-
+  Profile user = ProfileProvider().readProfile();
   @override
   Widget build(BuildContext context) {
+    coins = user.coins;
     return Scaffold(
       appBar: AppBar(
-        title: Container(
-          padding: const EdgeInsets.all(8.0),
-          child: Text(
-            "Shop",
-            style: TextStyle(
-                fontFamily: "Quick", fontWeight: FontWeight.bold, fontSize: 20),
+        title: GestureDetector(
+          onTap: () {
+            ProfileProvider().readProfile();
+            ShopProvider().readTodayList();
+          },
+          child: Container(
+            padding: const EdgeInsets.all(8.0),
+            child: Text(
+              "Shop",
+              style: TextStyle(
+                  fontFamily: "Quick",
+                  fontWeight: FontWeight.bold,
+                  fontSize: 20),
+            ),
           ),
         ),
       ),
@@ -107,6 +136,7 @@ class _ShopState extends State<Shop> {
                                       context, "Inventory");
                                   setState(() {
                                     coins = result as int;
+                                    user.coins = coins;
                                   });
                                 },
                                 child: Container(
@@ -127,7 +157,7 @@ class _ShopState extends State<Shop> {
                               child: Row(
                                 children: [
                                   Text(
-                                    "  ${coins}  ",
+                                    "  ${user.coins}  ",
                                     style: TextStyle(
                                         fontFamily: "Quick",
                                         fontWeight: FontWeight.bold,
@@ -149,7 +179,25 @@ class _ShopState extends State<Shop> {
                           ],
                         ),
                       ),
+                      Text.rich(
+                        TextSpan(children: [
+                          TextSpan(
+                            text: "Reset in ",
+                          ),
+                          TextSpan(
+                            text: "${_timeDifference}",
+                            style: TextStyle(
+                              color: Colors.indigo
+                            )
+                          )
+                        ]),
+                        style: TextStyle(
+                            fontFamily: "Quick",
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16),
+                      ),
                     ],
+                    crossAxisAlignment: CrossAxisAlignment.start,
                   ),
                 ),
               ),
@@ -355,7 +403,6 @@ class _ShopState extends State<Shop> {
             : rarity == 5
                 ? Colors.orange
                 : Colors.red;
-    String image = item.image;
     String text = "Owned";
     // set free for 0$ items
     String priceTag = item.price != 0 ? "${item.price}" : "Free";
@@ -429,7 +476,7 @@ class _ShopState extends State<Shop> {
                             user.inventory.add(id);
                             user.coins = user.coins - price;
                             snack("item was added to your inventory", false);
-                            // user.framePath = image;
+                            achievementsHandler("orv2", context);
                             ProfileProvider().saveProfile(user, "", context);
                             achievementsHandler("coins", context);
                             setState(() {});
@@ -502,6 +549,7 @@ class _ShopState extends State<Shop> {
           alignment: Alignment.topCenter,
           children: [
             Container(
+              width: MediaQuery.sizeOf(context).width / 3.5,
               decoration: BoxDecoration(
                   border: Border.all(color: color.withOpacity(.1)),
                   color: color.withOpacity(.2),
@@ -565,6 +613,7 @@ class _ShopState extends State<Shop> {
                             if (user.coins >= price) {
                               user.inventory.add(id);
                               user.coins = user.coins - price;
+                              coins - price;
                               ProfileProvider().saveProfile(user, "", context);
                               achievementsHandler("coins", context);
                               snack("item was added to your inventory", false);

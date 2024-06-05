@@ -3,11 +3,11 @@ import 'package:equatable/equatable.dart';
 class Daily extends Equatable {
   String title;
   int exp;
-  bool isGoing;
-  bool standard;
+  bool isGoing; // the task state 
+  bool standard; // is it standard
   String timeStamp;
-  int coins;
-  bool isFree;
+  int coins; // reword
+  bool isFree; // is side quest or main
 
   Daily({
     required this.title,

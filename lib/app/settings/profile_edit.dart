@@ -1,13 +1,9 @@
 import 'dart:io';
-
 import 'package:SoloLife/app/core/utils/items_archive.dart';
 import 'package:SoloLife/app/data/models/profile.dart';
 import 'package:SoloLife/app/data/models/shopItem.dart';
 import 'package:SoloLife/app/data/providers/task/provider.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:flutter/widgets.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:path_provider/path_provider.dart';
 
@@ -18,568 +14,558 @@ class ProfileInformation extends StatefulWidget {
   State<ProfileInformation> createState() => _ProfileInformationState();
 }
 
-  Profile user = ProfileProvider().readProfile();
 class _ProfileInformationState extends State<ProfileInformation> {
+  // initialize the vars
   late File pfpPath;
   String globalFrame = "";
   bool isThere = false;
-  // ---------------
   late File coverPath;
   bool isThereCover = false;
-  // -------------------
-  String frame = user.framePath;
-  // -------------
+  Profile user = ProfileProvider().readProfile();
   int length = 0;
-  // --------------
-  
-    Future<void> _loadImage() async {
-    final Directory appDirectory = await getApplicationDocumentsDirectory();
-    final String filePath = '${appDirectory.path}/pfp_image.png';
-    if (await File(filePath).exists()) {
-      setState(() {
-        pfpPath = File(filePath);
-        isThere = true;
-      });
-    }else{
-      setState(() {
-        pfpPath = File("");
-        isThere = false;
-      });
-    }
-  }
-    Future<File> _loadImageNow() async {
-    final Directory appDirectory = await getApplicationDocumentsDirectory();
-    final String filePath = '${appDirectory.path}/pfp_image.png';
-      setState(() {
-        pfpPath = File(filePath);
-        isThere = true;
-      });
-      return pfpPath;
-  }
-    Future<void> _loadCover() async {
-    final Directory appDirectory = await getApplicationDocumentsDirectory();
-    final String filePath = '${appDirectory.path}/cover_image.png';
-    if (await File(filePath).exists()) {
-      setState(() {
-        coverPath = File(filePath);
-        isThereCover = true;
-      });
-    }else{
-      setState(() {
-        coverPath = File("");
-        isThereCover = false;
-      });
-    }
-  }
-  Future<List<File>> loadCoverNow() async{
+
+
+  // get the cover images if it existed
+  Future<List<File>> loadCoverNow() async {
     final Directory appDirectory = await getApplicationDocumentsDirectory();
     final String filePath = '${appDirectory.path}/cover_image.png';
     final Directory appDirectory2 = await getApplicationDocumentsDirectory();
     final String filePath2 = '${appDirectory2.path}/pfp_image.png';
     coverPath = File(filePath2);
     File pfpPath = File(filePath);
-    if(await coverPath.exists()){
-        isThere = true;
+    if (await coverPath.exists()) {
+      isThere = true;
     }
-    if(await pfpPath.exists()){
+    if (await pfpPath.exists()) {
       isThereCover = true;
     }
-        return [coverPath,pfpPath];
+    return [coverPath, pfpPath];
   }
 
+  // get the cover direction
+  Future<void> deleteCoverDirectory(String path) async {
+    String coverDirectoryPath = path;
+    // Check if the directory exists
+    if (await Directory(coverDirectoryPath).exists()) {
+      // Delete the directory and all its contents recursively
+      Directory(coverDirectoryPath).deleteSync(recursive: true);
+    } else {
+      throw "error";
+    }
+  }
+  // choose the images 
+  Future<void> _pickImageCover(ImageSource source, VoidCallback refresh) async {
+    final pickedFile = await ImagePicker().pickImage(source: source);
 
-
-
-Future<void> _pickImage(ImageSource source,VoidCallback refresh) async {
-  final pickedFile = await ImagePicker().pickImage(source: source);
-
-  if (pickedFile != null) {
-    final File imageFile = File(pickedFile.path);
-    final Directory appDirectory = await getApplicationDocumentsDirectory();
-    final String filePath = '${appDirectory.path}/pfp_image.png';
-
-    await imageFile.copy(filePath);
-
+    if (pickedFile != null) {
+      final File imageFile = File(pickedFile.path);
+      final Directory appDirectory = await getApplicationDocumentsDirectory();
+      deleteCoverDirectory(user.coverPath);
+      final String filePath = '${appDirectory.path}/${DateTime.now()}.jpg';
+      await imageFile.copy(filePath);
+      user.coverPath = filePath;
+      ProfileProvider().saveProfile(user, "", context);
       coverPath = File(filePath);
       isThereCover = true; // Update state to indicate that the image is present
-    setState(() {
-    });
-    refresh();
-  }
-}
-Future<void> deleteCoverDirectory(String path) async {
-  String coverDirectoryPath = path;
-  print("============================== action is taking ===============${await Directory(coverDirectoryPath).exists()}");
-  // Check if the directory exists
-  if (await Directory(coverDirectoryPath).exists()) {
-    // Delete the directory and all its contents recursively
-    Directory(coverDirectoryPath).deleteSync(recursive: true);
-    print('Cover directory deleted successfully.');
-  } else {
-    print('${coverDirectoryPath} does not exist.');
-  }
-}
-Future<void> _pickImageCover(ImageSource source,VoidCallback refresh) async {
-  final pickedFile = await ImagePicker().pickImage(source: source);
-
-  if (pickedFile != null) {
-    final File imageFile = File(pickedFile.path);
-    final Directory appDirectory = await getApplicationDocumentsDirectory();
-    deleteCoverDirectory(user.coverPath);
-    print("======================== action1");
-    final String filePath = '${appDirectory.path}/${DateTime.now()}.jpg';
-    print("======================== action2");
-    await imageFile.copy(filePath);
-    user.coverPath = filePath;
-    ProfileProvider().saveProfile(user, "", context);
-    print("======================== action3");
-    print("======================== ${user.coverPath}");
-      coverPath = File(filePath);
-      isThereCover = true; // Update state to indicate that the image is present
-    setState(() {
-    });
-        refresh;
-
-  }
+      setState(() {});
+      refresh;
+    }
     refresh;
-}
+  }
 
-Future<void> _pickImageCover1(ImageSource source,VoidCallback refresh) async {
-  final pickedFile = await ImagePicker().pickImage(source: source);
-
-  if (pickedFile != null) {
-    final File imageFile = File(pickedFile.path);
-    final Directory appDirectory = await getApplicationDocumentsDirectory();
-    final String filePath = '${appDirectory.path}/${DateTime.now()}.jpg';
-    deleteCoverDirectory(user.pfpPath);
-    user.pfpPath = filePath;
-    await imageFile.copy(filePath);
-    ProfileProvider().saveProfile(user, "", context);
+  // pick the image 
+  Future<void> _pickImagePfp(
+      ImageSource source, VoidCallback refresh) async {
+    final pickedFile = await ImagePicker().pickImage(source: source);
+    if (pickedFile != null) {
+      final File imageFile = File(pickedFile.path);
+      final Directory appDirectory = await getApplicationDocumentsDirectory();
+      final String filePath = '${appDirectory.path}/${DateTime.now()}.jpg';
+      deleteCoverDirectory(user.pfpPath);
+      user.pfpPath = filePath;
+      await imageFile.copy(filePath);
+      ProfileProvider().saveProfile(user, "", context);
       pfpPath = File(filePath);
       isThere = true; // Update state to indicate that the image is present
-    setState(() {
-    });
-        refresh;
-
-  }
+      setState(() {});
+      refresh;
+    }
     refresh;
-}
+  }
 
-void getImages() {
-      Profile user = ProfileProvider().readProfile();
-      globalFrame = user.framePath;
-    if(user.coverPath != ""){
+  void getImages() {
+    Profile user = ProfileProvider().readProfile();
+    globalFrame = user.framePath;
+    if (user.coverPath != "") {
       setState(() {
         coverPath = File(user.coverPath);
         isThereCover = true;
       });
-    }else{
-        setState(() {
+    } else {
+      setState(() {
         coverPath = File("");
         isThereCover = false;
       });
     }
-    if(user.pfpPath != ""){
+    if (user.pfpPath != "") {
       setState(() {
-        print("================${user.pfpPath}");
         pfpPath = File(user.pfpPath);
         isThere = true;
       });
-    }else{
-        setState(() {
+    } else {
+      setState(() {
         pfpPath = File("");
         isThere = false;
       });
     }
-    }
+  }
+
   @override
   void initState() {
-    //_loadImage();
     controller.text = user.userName;
     length = user.userName.characters.length;
     getImages();
     super.initState();
   }
+
   TextEditingController controller = TextEditingController();
-  Widget build(BuildContext context,) {
-    
-    Widget cover(bool isThereCover,File path){
-      if(user.coverPath != "") {
-
-            
-            return Container(
-              height: 250,
-              width: MediaQuery.sizeOf(context).width,
-              child: Image.file(path,fit: BoxFit.cover,));
-
-      }else{
+  Widget build(
+    BuildContext context,
+  ) {
+    // the cover widget
+    Widget cover(bool isThereCover, File path) {
+      if (user.coverPath != "") {
         return Container(
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.vertical(bottom: Radius.circular(15))
-          ),
-          height: 250,
-          width: MediaQuery.sizeOf(context).width,
-          child: Image.asset(
-            'assets/images/giphy.gif',
-            fit: BoxFit.cover,
+            height: 250,
+            width: MediaQuery.sizeOf(context).width,
+            child: Image.file(
+              path,
+              fit: BoxFit.cover,
+            ));
+      } else {
+        return Container(
+            decoration: BoxDecoration(
+                borderRadius:
+                    BorderRadius.vertical(bottom: Radius.circular(15))),
+            height: 250,
+            width: MediaQuery.sizeOf(context).width,
+            child: Image.asset(
+              'assets/images/cover.png',
+              fit: BoxFit.cover,
             ));
       }
     }
+
     return Scaffold(
-      appBar: AppBar(
-        actions: [
-          
-        ],
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.vertical(bottom: Radius.circular(50))
+        appBar: AppBar(
+          actions: [],
+          shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.vertical(bottom: Radius.circular(50))),
+          leading: GestureDetector(
+              onTap: () {
+                Navigator.popAndPushNamed(context, "HomePage");
+              },
+              child: Icon(Icons.arrow_back)),
+          centerTitle: true,
+          title: Text(
+            "Profile Information",
+            style: TextStyle(fontFamily: "Quick", fontWeight: FontWeight.bold),
+          ),
         ),
-        leading: GestureDetector(
-          onTap:(){
+        body: PopScope(
+          canPop: false,
+          onPopInvoked: (didPop) async {
+            if (didPop) {
+              return;
+            }
             Navigator.popAndPushNamed(context, "HomePage");
           },
-          child: Icon(Icons.arrow_back)),
-        centerTitle:true,
-        title: Text( "Profile Information",style: TextStyle(fontFamily: "Quick",fontWeight: FontWeight.bold),),
-      ),
-      body: PopScope(
-         canPop: false,
- onPopInvoked: (didPop) async {
-  if (didPop) {
-    return;
-  }
-  Navigator.popAndPushNamed(context, "HomePage");
-  },
-        child: ListView(
+          child: ListView(
+            children: [
+              Container(
+                height: 270,
+                child: Stack(
                   children: [
                     Container(
-                      height: 270,
-                      child: Stack(
-                        children: [
-                       Container(
-                            
                         child: Stack(
-                          children: [
-                            cover(isThereCover,coverPath),
-                            Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: GestureDetector(
-                                onTap: () {
-                                _pickImageCover(ImageSource.gallery,(){setState(() {
-                                  
-                                });});
-                                setState((){});
-                               },
-                                child: Container(
-                                  padding: EdgeInsets.all(8),
-                                  decoration: BoxDecoration(
-                                  shape: BoxShape.circle,
-                                  color: Colors.indigo.withOpacity(.5)
-                                ),child: Icon(Icons.edit,color: Colors.white,),),
-                              ),
-                            )
-                          ],
-                        )),
-                        
-                        Align(
-                          alignment: Alignment.bottomCenter,
-                          child: Stack(alignment: Alignment.bottomCenter,
-                                        children: [
-                                          Container(
-                                            height: 90,
-                                            decoration: BoxDecoration(
-                                              color: Theme.of(context).cardColor,
-                                              borderRadius: BorderRadius.vertical(top: Radius.circular(20))
-                                            ),
-                                          ),
-                                          Padding(
-                                            padding: const EdgeInsets.all(5),
-                                            child: Container(
-                                            
-                                            decoration: BoxDecoration(
-                                              border: Border.all(
-                                                width: 5,
-                                                color:globalFrame != ""? Colors.transparent :Colors.black,),
-                                              shape: BoxShape.circle
-                                            ),
-                                            
-                                              child: CircleAvatar(
-                                                
-                                                        radius: 65,
-                                                        backgroundImage: isThere
-                                                            ? FileImage(pfpPath)
-                                                            : AssetImage('assets/images/giphy.gif') as ImageProvider,
-                                                             ),
-                                            ),
-                                          ),
-                                           //? the Rank budget 
-                                           if(globalFrame != "")
-                                        Image.asset(globalFrame,width: 165, height:150,fit: BoxFit.cover, ),
-                                            
-                                        ],
-                                      ),
-                        ),
-                        
-                      ],),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.only(top:4),
-                      child: Padding(
-                        padding: const EdgeInsets.all(12),
-                        child: Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                          children: [
-                            button("Change avatar", () {
-                              _pickImageCover1(ImageSource.gallery,(){setState(() {
-                                
-                              });});
-                              setState((){});
-                             }),
-                            //Container(),
-                        button("Change Frame", () {
-                          bottomSheet(
-                            (){
-                            user.framePath = globalFrame;
-                            ProfileProvider().saveProfile(user, "", context);
-                              setState(() {
-                          });});
-                         }),
-                          ],
-                        ),
-                      ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 60),
-                      child: Divider(),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 20,vertical: 8),
-                      child: Column(crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                        Text("UserName",
-                        style: TextStyle(
-                          fontFamily: "Quick",
-                          fontWeight: FontWeight.bold,
-                          color: Theme.of(context).iconTheme.color!.withOpacity(.6),
-                          fontSize: 16
-                        ),),
+                      children: [
+                        cover(isThereCover, coverPath),
                         Padding(
-                          padding: const EdgeInsets.only(top:8),
-                          child: Container(
-                            padding: EdgeInsets.all(0),
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(10),
-                              border: Border.all(
-                                width: .5,
-                                color:Theme.of(context).iconTheme.color!.withOpacity(.2))
-                            ),
-                            child: TextField(
-                              onChanged: (controller){
-                                length = controller.characters.length;
-                                setState((){});
-                              },
-                              controller: controller,
-                              maxLength: 15,
-                              decoration: InputDecoration(
-                                counter: 
-                                  Offstage(),
-                                  suffix: Padding(
-                                    padding: const EdgeInsets.only(right:8.0),
-                                    child: Text("$length/15",
-                                    style: TextStyle(
-                                      fontSize: 14,
-                                    color: Theme.of(context).iconTheme.color!.withOpacity(.4),),),
-                                  ),
-                                contentPadding: EdgeInsets.only(left:12),
-                                
-                                border:InputBorder.none 
+                          padding: const EdgeInsets.all(8.0),
+                          child: GestureDetector(
+                            onTap: () {
+                              print(user.exp);
+                              _pickImageCover(ImageSource.gallery, () {
+                                setState(() {});
+                              });
+                              setState(() {});
+                            },
+                            child: Container(
+                              padding: EdgeInsets.all(8),
+                              decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  color: Colors.indigo.withOpacity(.5)),
+                              child: Icon(
+                                Icons.edit,
+                                color: Colors.white,
                               ),
                             ),
                           ),
                         )
-                      ],),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 18,vertical: 8),
-                      child: Text("Your UserName is showing in the main quests page you can change it when ever you want from here though it must stay in the 10 letters limit ",
-                      style: TextStyle(fontFamily: "Quick",fontWeight: FontWeight.bold,color: Theme.of(context).iconTheme.color!.withOpacity(.5)),),
-                    ),
-                    SizedBox(height: 100,),
-                    Padding(
-                      padding: const EdgeInsets.only(bottom:8.0),
-                      child: Align(alignment: Alignment.bottomCenter,
-                        child: GestureDetector(
-                          onTap: (){
-                            user.userName = controller.text;
-                            user.framePath = globalFrame;
-                            ProfileProvider().saveProfile(user, "",context);
-                            Navigator.popAndPushNamed(context, "HomePage");
-                          },
-                          child: Container(
-                            padding: EdgeInsets.symmetric(horizontal: 80,vertical: 14),
+                      ],
+                    )),
+                    Align(
+                      alignment: Alignment.bottomCenter,
+                      child: Stack(
+                        alignment: Alignment.bottomCenter,
+                        children: [
+                          Container(
+                            height: 90,
                             decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(15),
-                              color: Colors.indigo
+                                color: Theme.of(context).cardColor,
+                                borderRadius: BorderRadius.vertical(
+                                    top: Radius.circular(20))),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.all(5),
+                            child: Container(
+                              decoration: BoxDecoration(
+                                  border: Border.all(
+                                    width: 5,
+                                    color: globalFrame != ""
+                                        ? Colors.transparent
+                                        : Colors.black,
+                                  ),
+                                  shape: BoxShape.circle),
+                              child: CircleAvatar(
+                                radius: 65,
+                                backgroundImage: isThere
+                                    ? FileImage(pfpPath)
+                                    : AssetImage('assets/images/cover.png')
+                                        as ImageProvider,
+                              ),
                             ),
-                            child: Text("Change Name",
-                            style: TextStyle(
-                              fontFamily: "Quick",
-                              fontWeight: FontWeight.bold,
-                              fontSize: 15,
-                              color: Colors.white),)),
-                        )),
+                          ),
+                          if (!isThere)
+                            Container(
+                              margin: EdgeInsets.only(bottom: 8),
+                              child: Container(
+                                width: 145,
+                                height: 135,
+                                decoration: BoxDecoration(
+                                    color: Colors.black.withOpacity(.4),
+                                    shape: BoxShape.circle),
+                              ),
+                            ),
+                          //? the Rank budget
+                          if (globalFrame != "")
+                            Image.asset(
+                              globalFrame,
+                              width: 165,
+                              height: 155,
+                              fit: BoxFit.cover,
+                            ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.only(top: 4),
+                child: Padding(
+                  padding: const EdgeInsets.all(12),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      button("Change avatar", () {
+                        _pickImagePfp(ImageSource.gallery, () {
+                          setState(() {});
+                        });
+                        setState(() {});
+                      }),
+                      //Container(),
+                      button("Change Frame", () {
+                        bottomSheet(() {
+                          user.framePath = globalFrame;
+                          ProfileProvider().saveProfile(user, "", context);
+                          setState(() {});
+                        });
+                      }),
+                    ],
+                  ),
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 60),
+                child: Divider(),
+              ),
+              Padding(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      "UserName",
+                      style: TextStyle(
+                          fontFamily: "Quick",
+                          fontWeight: FontWeight.bold,
+                          color: Theme.of(context)
+                              .iconTheme
+                              .color!
+                              .withOpacity(.6),
+                          fontSize: 16),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.only(top: 8),
+                      child: Container(
+                        padding: EdgeInsets.all(0),
+                        decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(10),
+                            border: Border.all(
+                                width: .5,
+                                color: Theme.of(context)
+                                    .iconTheme
+                                    .color!
+                                    .withOpacity(.2))),
+                        child: TextField(
+                          onChanged: (controller) {
+                            length = controller.characters.length;
+                            setState(() {});
+                          },
+                          controller: controller,
+                          maxLength: 15,
+                          decoration: InputDecoration(
+                              counter: Offstage(),
+                              suffix: Padding(
+                                padding: const EdgeInsets.only(right: 8.0),
+                                child: Text(
+                                  "$length/15",
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                    color: Theme.of(context)
+                                        .iconTheme
+                                        .color!
+                                        .withOpacity(.4),
+                                  ),
+                                ),
+                              ),
+                              contentPadding: EdgeInsets.only(left: 12, top: 6),
+                              border: InputBorder.none),
+                        ),
+                      ),
                     )
-                  ],),
-      )
-    );
+                  ],
+                ),
+              ),
+              Padding(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 18, vertical: 8),
+                child: Text(
+                  "Your UserName is showing in the main quests page you can change it when ever you want from here though it must stay in the 15 letters limit ",
+                  style: TextStyle(
+                      fontFamily: "Quick",
+                      fontWeight: FontWeight.bold,
+                      color:
+                          Theme.of(context).iconTheme.color!.withOpacity(.5)),
+                ),
+              ),
+              SizedBox(
+                height: 100,
+              ),
+              Padding(
+                padding: const EdgeInsets.only(bottom: 8.0),
+                child: Align(
+                    alignment: Alignment.bottomCenter,
+                    child: GestureDetector(
+                      onTap: () {
+                        user.userName = controller.text;
+                        user.framePath = globalFrame;
+                        ProfileProvider().saveProfile(user, "", context);
+                        print("======================${user.framePath}");
+                        Navigator.popAndPushNamed(context, "HomePage");
+                      },
+                      child: Container(
+                          padding: EdgeInsets.symmetric(
+                              horizontal: 80, vertical: 14),
+                          decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(15),
+                              color: Colors.indigo),
+                          child: Text(
+                            "Change Name",
+                            style: TextStyle(
+                                fontFamily: "Quick",
+                                fontWeight: FontWeight.bold,
+                                fontSize: 15,
+                                color: Colors.white),
+                          )),
+                    )),
+              )
+            ],
+          ),
+        ));
   }
-  Widget button(String title,void Function() onTap){
+
+  Widget button(String title, void Function() onTap) {
     return GestureDetector(
       onTap: onTap,
       child: Row(
         children: [
           Container(
-            padding: EdgeInsets.symmetric(horizontal: 22,vertical: 12),
+            padding: EdgeInsets.symmetric(horizontal: 22, vertical: 12),
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(10),
               color: Colors.indigo.withOpacity(.3),
             ),
-            child: Text(title,
-            style: TextStyle(
-              fontFamily: "Quick",
-              //color: Colors.indigo,
-              fontSize: 16,
-              fontWeight: FontWeight.bold,),),
+            child: Text(
+              title,
+              style: TextStyle(
+                fontFamily: "Quick",
+                //color: Colors.indigo,
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
           ),
         ],
       ),
     );
   }
 
-  void bottomSheet(void Function() refresh){
+  void bottomSheet(void Function() refresh) {
     // Filter the archive map based on inventory keys and item type "frame"
 /*List<dynamic> frameItemsInInventory = archive.entries
     .where((entry) => user.inventory.contains(entry.key) && entry.value.itemType == "frame")
     .map((entry) => entry.value)
     .toList();*/
-    List<dynamic> ids = user.inventory.where((element) => (element.contains("Frame") && archive[element] != null)).toList();
+    List<dynamic> ids = user.inventory
+        .where((element) =>
+            (element.contains("Frame") && archive[element] != null))
+        .toList();
     showModalBottomSheet(
-      barrierColor: Colors.transparent,
-      elevation: 10,
-      context: context, 
-      builder: (BuildContext context){
-        if(ids.isEmpty){
-          return Padding(
-            padding: const EdgeInsets.all(20),
-            child: Container(
-              child: Text(
-                textAlign: TextAlign.center,
-                "The Frames you own will appears here currently you have none (0o0!)",
-              style: TextStyle(
-                fontFamily: "Quick",
-                fontWeight: FontWeight.bold,
-                fontSize: 22
-              ),),),
-          );
-        }else{
-        return StatefulBuilder(
-          builder: (context,setState) {
-            return Container(
-              padding: EdgeInsets.all(12),
-              child: SingleChildScrollView(
-        
-                child: Column(
-                  children: [
-                    Text("Choose a New Frame",style: TextStyle(
-                  fontFamily: "Quick",
-                  fontWeight: FontWeight.bold,
-                  fontSize: 21)),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 40,vertical: 8),
-                    child: Divider(),
-                  ),
-                    GridView.builder(
-                      physics: NeverScrollableScrollPhysics(),
-                      shrinkWrap: true,
-                      itemCount: ids.length,
-                      gridDelegate:
-                          SliverGridDelegateWithFixedCrossAxisCount(
-                            mainAxisSpacing: 12,
-                            crossAxisSpacing: 12,
-                            childAspectRatio: 1,
-                    crossAxisCount: 3),
-                      itemBuilder: (context, index) {
-                        String pathFrame = user.framePath;
-                        // get the item and its count at the current index
-                        String itemId = ids[index];
-                    
-                        // find the corresponding item in the archive
-                        ShopItem item = archive[itemId];
-                    
-                        // build the widget for the item
-                        return Padding(
-                          padding: const EdgeInsets.all(4),
-                          child: 
-                          GestureDetector(
-                            onTap:() {
-                              //Profile user = ProfileProvider().readProfile();
-                                        globalFrame = item.image;
-                                        
-                                        
-                                        //print("---------- cover ----------------${user.framePath}");
-                                        //ProfileProvider().saveProfile(user, "",context);
-                                        //Profile user1 = ProfileProvider().readProfile();
-                                        print("--- -------- --------- -------- 2 ---- ${globalFrame}");
-                                        setState((){});
-                                        refresh();
-                                        //Navigator.pop(context);
-                            },
-                            child: Stack(
-                              children: [
-                                itemData(item.title, item.image,item.rarity,item.image,pathFrame),
-                              if(item.image == globalFrame)
-                    Container(
-                      padding: EdgeInsets.symmetric(vertical: 8,horizontal: 8),
-                      decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(12),
-                      color: Colors.indigo.withOpacity(.85)
-                    ),child: Icon(Icons.done,color: Colors.white,),)
-                              ],
-                            ),
-                          ),
-                        );
-                      },
-                    ),
-                  ],
+        barrierColor: Colors.transparent,
+        elevation: 10,
+        context: context,
+        builder: (BuildContext context) {
+          if (ids.isEmpty) {
+            return Padding(
+              padding: const EdgeInsets.all(20),
+              child: Container(
+                child: Text(
+                  textAlign: TextAlign.center,
+                  "The Frames you own will appears here currently you have none (0o0!)",
+                  style: TextStyle(
+                      fontFamily: "Quick",
+                      fontWeight: FontWeight.bold,
+                      fontSize: 22),
                 ),
               ),
             );
+          } else {
+            return StatefulBuilder(builder: (context, setState) {
+              return Container(
+                padding: EdgeInsets.all(12),
+                child: SingleChildScrollView(
+                  child: Column(
+                    children: [
+                      Text("Choose a New Frame",
+                          style: TextStyle(
+                              fontFamily: "Quick",
+                              fontWeight: FontWeight.bold,
+                              fontSize: 21)),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 40, vertical: 8),
+                        child: Divider(),
+                      ),
+                      GridView.builder(
+                        physics: NeverScrollableScrollPhysics(),
+                        shrinkWrap: true,
+                        itemCount: ids.length,
+                        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                            mainAxisSpacing: 12,
+                            crossAxisSpacing: 12,
+                            childAspectRatio: 1,
+                            crossAxisCount: 3),
+                        itemBuilder: (context, index) {
+                          String pathFrame = user.framePath;
+                          // get the item and its count at the current index
+                          String itemId = ids[index];
+
+                          // find the corresponding item in the archive
+                          ShopItem item = archive[itemId];
+
+                          // build the widget for the item
+                          return Padding(
+                            padding: const EdgeInsets.all(4),
+                            child: GestureDetector(
+                              onTap: () {
+                                //Profile user = ProfileProvider().readProfile();
+                                globalFrame = item.image;
+
+                                //print("---------- cover ----------------${user.framePath}");
+                                //ProfileProvider().saveProfile(user, "",context);
+                                //Profile user1 = ProfileProvider().readProfile();
+                                print(
+                                    "--- -------- --------- -------- 2 ---- ${globalFrame}");
+                                setState(() {});
+                                refresh();
+                                //Navigator.pop(context);
+                              },
+                              child: Stack(
+                                children: [
+                                  itemData(item.title, item.image, item.rarity,
+                                      item.image, pathFrame),
+                                  if (item.image == globalFrame)
+                                    Container(
+                                      padding: EdgeInsets.symmetric(
+                                          vertical: 8, horizontal: 8),
+                                      decoration: BoxDecoration(
+                                          borderRadius:
+                                              BorderRadius.circular(12),
+                                          color:
+                                              Colors.indigo.withOpacity(.85)),
+                                      child: Icon(
+                                        Icons.done,
+                                        color: Colors.white,
+                                      ),
+                                    )
+                                ],
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            });
           }
-        );
-        }
-      });
+        });
   }
 
-  Widget itemData(String name, String image,int rarity,String path,String pathFrame){
+  Widget itemData(
+      String name, String image, int rarity, String path, String pathFrame) {
     return Container(
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(15),
-        border: Border.all(color:Colors.indigo.withOpacity(.3)),
-        color: Colors.indigo.withOpacity(.15),
-        
-      ),
-      child: Stack(alignment: Alignment.topRight,
-        children: [
-          Padding(
-            padding: const EdgeInsets.all(4),
-            child: Image.asset(image),
-          ),
-          //Divider(),
-          
-        ],
-      ));
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(15),
+          border: Border.all(color: Colors.indigo.withOpacity(.3)),
+          color: Colors.indigo.withOpacity(.15),
+        ),
+        child: Stack(
+          alignment: Alignment.topRight,
+          children: [
+            Padding(
+              padding: const EdgeInsets.all(4),
+              child: Image.asset(image),
+            ),
+            //Divider(),
+          ],
+        ));
   }
 }
-
-
 
 /*
 import 'dart:io';

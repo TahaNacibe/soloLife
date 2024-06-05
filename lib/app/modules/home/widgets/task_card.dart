@@ -7,7 +7,10 @@ import 'package:get/get.dart';
 import 'package:step_progress_indicator/step_progress_indicator.dart';
 
 class TaskCard extends StatelessWidget {
+  // initialize the storage services
   final HomeController homeCtrl = Get.find<HomeController>();
+
+  // initialize the vars
   final Task task;
   final bool isBox;
 
@@ -15,6 +18,7 @@ class TaskCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // initialize the vars
     final color = HexColor.fromHex(task.color);
     var squareWidth = Get.width - 12.0.wp;
 
@@ -159,6 +163,7 @@ class TaskCard extends StatelessWidget {
                           ],
                         ),
                       ),
+                      // progress widget
                       CircularStepProgressIndicator(
                         selectedColor: color,
                         unselectedColor: Colors.grey.withOpacity(.4),

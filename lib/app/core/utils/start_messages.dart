@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
 
 
-List <Widget> start =[limit(),over(),you(),showThem(),loose(),lesson(),lesson2(),level()];
+// the changing message at the bottom of the loading screen 
+
+List <Widget> start =[limit(),over(),you(),showThem(),loose(),lesson(),lesson2(),level()];// the list countian all the messages and randomly choose one
+
+// first message 
 Widget limit(){
   return  Column(
     crossAxisAlignment: CrossAxisAlignment.center,
@@ -19,7 +23,7 @@ Widget limit(){
                     ),
                     TextSpan(children: [
                     TextSpan(text:" Surpass Your"),
-                    TextSpan(text: " Limit ",style: TextStyle(color: Colors.red)),
+                    TextSpan(text: " Limit ",style: TextStyle(color: Colors.red)), // just to set a colored touch to it (^o^)/
                     TextSpan(text: "Here And Now"),
                    ])),
                  ),
@@ -46,6 +50,7 @@ Widget over(){
            );
 }
 
+// the same go for the rest
 Widget you(){
   return  Padding(
              padding: const EdgeInsets.all(12),

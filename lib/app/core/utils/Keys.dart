@@ -1,4 +1,6 @@
 // ignore_for_file: file_names
+
+// just keys for the storage services are stored here
 //? the task storage key 
 const taskKey = 'tasks';
 //? the user personal data key
@@ -15,5 +17,7 @@ const voltageKey = 'voltage';
 const logKey = 'log';
 //? sates key
 const statesKey = 'states';
-//? reserved names of tasks
+//? shop key
+const shopKey = 'todayList33';
+//? reserved names of tasks, to evade user opening the tool just by creating it
 const List<String> reservedNames = ["Dream Space","Daily Quests","Budget Manager","Voltage"];

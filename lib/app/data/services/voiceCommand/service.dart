@@ -2,7 +2,6 @@
 
 import 'package:SoloLife/app/core/utils/extensions.dart';
 import 'package:SoloLife/app/core/values/icons.dart';
-import 'package:SoloLife/app/data/models/achivments.dart';
 import 'package:SoloLife/app/data/models/profile.dart';
 import 'package:SoloLife/app/data/models/solo.dart';
 import 'package:SoloLife/app/data/models/state.dart';
@@ -19,7 +18,7 @@ List<dynamic> authority = userInfo.keys ?? [];
 
 
 
-//
+// hin message for help command
 String helpHint = """'master control' --> to activate master level\n
 'protocol solo' --> to activate daily quests\n
 'protocol dream' --> to open the vault\n
@@ -139,7 +138,9 @@ void soloProtocol(BuildContext context){
   }
     // update the user data
     ProfileProvider().saveProfile(userInfo,"",context);
+    // get the date for the tasks
     String time = DateTime.now().toIso8601String();
+    // create the first dailies
     List<Daily> startUp = [
     Daily(title:"Push-Ups  [100]" , exp: getExpForTheTasks(userInfo.level,false),standard: true,timeStamp:time, coins: getCoinsForTheTasks(false)),
     Daily(title:"Set-Ups  [100]" , exp: getExpForTheTasks(userInfo.level,false),standard: true,timeStamp:time, coins: getCoinsForTheTasks(false)),
@@ -147,6 +148,7 @@ void soloProtocol(BuildContext context){
     Daily(title:"Squats  [100]" , exp: getExpForTheTasks(userInfo.level,false),standard: true,timeStamp:time, coins: getCoinsForTheTasks(false)),
     Daily(title:"Running  [10Km]" , exp: getExpForTheTasks(userInfo.level,false),standard: true,timeStamp:time, coins: getCoinsForTheTasks(false)),
     ];
+    // save the changes
     DailyTasks().writeTasks(startUp);
 }
 

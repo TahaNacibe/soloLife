@@ -1,8 +1,6 @@
 import 'package:SoloLife/app/data/models/profile.dart';
 import 'package:SoloLife/app/data/providers/task/provider.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 
 class Password extends StatefulWidget {
   const Password({super.key});
@@ -12,20 +10,26 @@ class Password extends StatefulWidget {
 }
 
 class _PasswordState extends State<Password> {
+  // initialize the controllers
     TextEditingController enteringController = TextEditingController();
     TextEditingController createController = TextEditingController();
     TextEditingController checkController = TextEditingController();
     TextEditingController questionController = TextEditingController();
     TextEditingController answerController = TextEditingController();
+    // read the user data
     Profile user = ProfileProvider().readProfile();
+    // initialize the vars
     String openMessage = "";
     String message = "";
     bool forget =false;
+
   @override
   Widget build(BuildContext context) {
+    // initialize the vars
     List<String> parts = user.forgetPassword.split(":");
     bool isClosed = user.password.isNotEmpty;
     String userPassword = user.password;
+
     return Scaffold(
       appBar: AppBar(title: Text("Password Manager",
       style: TextStyle(
@@ -128,6 +132,7 @@ class _PasswordState extends State<Password> {
                   ),
                   GestureDetector(
                     onTap:(){
+                      // if every field is okay 
                       if(createController.text.isNotEmpty && createController.text == checkController.text){
                         if(questionController.text.isNotEmpty && answerController.text.isNotEmpty){
                           user.password = createController.text;
@@ -136,6 +141,7 @@ class _PasswordState extends State<Password> {
                           openMessage = "Password Updated";
                           Navigator.pop(context);
                           setState(() {});
+                          // problems 
                         }else if(user.forgetPassword.isNotEmpty && questionController.text.isEmpty && answerController.text.isEmpty){
                         user.password = createController.text;
                         ProfileProvider().saveProfile(user, "", context);

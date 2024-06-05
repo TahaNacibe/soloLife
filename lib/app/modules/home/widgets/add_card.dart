@@ -1,7 +1,7 @@
 import 'package:SoloLife/app/core/utils/Keys.dart';
 import 'package:SoloLife/app/core/utils/extensions.dart';
 import 'package:SoloLife/app/core/values/colors.dart';
-import 'package:SoloLife/app/data/models/achivments.dart';
+import 'package:SoloLife/app/data/models/achievements.dart';
 import 'package:SoloLife/app/data/models/task.dart';
 import 'package:SoloLife/app/data/services/expScal/exp.dart';
 import 'package:SoloLife/app/modules/home/controller.dart';
@@ -12,16 +12,17 @@ import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:get/get.dart';
 
 class AddCard extends StatelessWidget {
+  // start the storage 
   final homeCtrl = Get.find<HomeController>();
+  // initialize the vars
   final void Function() change;
   AddCard({super.key, required this.change});
 
   @override
   Widget build(BuildContext context) {
+    // get the icons 
     final icons = getIcons();
     return Container(
-      //width: squareWidth / 2,
-      //height: squareWidth / 2,
       margin: EdgeInsets.all(3.0.wp),
       decoration: BoxDecoration(
         color: Theme.of(context).cardColor,
@@ -118,6 +119,12 @@ class AddCard extends StatelessWidget {
                             Get.back();
                             if(homeCtrl.addTask(task)){
                                EasyLoading.showSuccess('Create successfully');
+                               if(homeCtrl.editCtrl.text.contains("novels")){
+                                achievementsHandler("orv1",context);
+                               }
+                               if(homeCtrl.tasks.length == 50){
+                                achievementsHandler("fate",context);
+                               }
                             }else{
                               //? the duplicated task
                             achievementsHandler("double",context);

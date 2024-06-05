@@ -17,9 +17,11 @@ class ManagerCard extends StatefulWidget {
 class _ManagerCardState extends State<ManagerCard> {
   @override
   Widget build(BuildContext context) {
+    // initialize the vars
     var squareWidth = Get.width - 12.0.wp;
-    List<Budget> log = BudgetProvider().readBudget();
-    int total = BudgetProvider().totalGater(log);
+    List<deposit> log = Amount().readBudget();
+    int total = Amount().totalGater(log);
+    
     return widget.isBox? GestureDetector(
       onTap:(){
         Navigator.popAndPushNamed(

@@ -1,25 +1,27 @@
 import 'package:SoloLife/app/core/utils/extensions.dart';
 import 'package:SoloLife/app/core/utils/icon_pack_icons.dart';
-import 'package:SoloLife/app/data/models/profile.dart';
-import 'package:SoloLife/app/data/providers/task/provider.dart';
 import 'package:SoloLife/app/modules/home/controller.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
-import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
 
 class DoingList extends StatelessWidget {
   final homeCtrl = Get.find<HomeController>();
   DoingList({super.key});
+
+  // Initializing variables
   bool isOrdering = false;
   int indexFor = 999999999;
+
   @override
   Widget build(BuildContext context) {
-    Profile user = ProfileProvider().readProfile();
+
+    // Getting the current task from homeCtrl
   var task = homeCtrl.task.value!;
     var color = HexColor.fromHex(task.color);
+
     return Obx(
+      // Returning a widget based on the state of doingTodos and doneTodos
+
       () => homeCtrl.doingTodos.isEmpty && homeCtrl.doneTodos.isEmpty
           ? Column(
               children: [
@@ -130,7 +132,6 @@ class DoingList extends StatelessWidget {
                                       });
                                       return false;
                                     },
-                                    //homeCtrl.deleteDoingTodo(element),
                                     background: Container(
                                       color: Colors.red.withOpacity(0.8),
                                       alignment: Alignment.centerRight,
@@ -198,55 +199,6 @@ class DoingList extends StatelessWidget {
                                           ],),
                                         )
                                       ),
-                                      /*
-                                      Column(
-                                          children: [
-                                            Row(
-                                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                              children: [
-                                                Row(
-                                                  children: [
-                                                    
-                                                    Padding(
-                                                  padding: EdgeInsets.symmetric(
-                                                    horizontal: 4,
-                                                  ),
-                                                  child: Text.rich(TextSpan(children: [
-                                                    TextSpan(text:+"\n"),
-                                                    TextSpan(text:,
-                                                    style: const TextStyle(
-                                                      fontWeight: FontWeight.bold,
-                                                      fontFamily: "Quick",
-                                                      color:Colors.blue,
-                                                      fontSize: 16), ),
-                                                      TextSpan(
-                                                        text:" coins:${element["coins"] ?? "free"}",
-                                                        style: TextStyle(color:Colors.orange)
-                                                      )
-                                                    ])
-                                                    ,
-                                                    overflow: TextOverflow.ellipsis,
-                                                    style: const TextStyle(
-                                                      fontWeight: FontWeight.bold,
-                                                      fontFamily: "Quick",
-                                                      fontSize: 15),
-                                                  ),
-                                                ),
-                                                  ],
-                                                ),
-                                  
-                                                      //
-                                                      
-                                              ],
-                                            ),
-                                            if(!(element == homeCtrl.doingTodos.last))
-                                             Padding(
-                                              padding: EdgeInsets.symmetric(horizontal: 30),
-                                              child: Divider(color:Theme.of(context).iconTheme.color!.withOpacity(.4)),
-                                            )
-                                          ],
-                                        ),
-                                      */
                                 ),
                               ),
                             ))
@@ -260,7 +212,7 @@ class DoingList extends StatelessWidget {
           ),
     );
   }
-
+// Function to show a bottom sheet for deleting a task
   void bottomShit(BuildContext context, var element,void Function() refresh) {
   showModalBottomSheet(
     backgroundColor: Colors.transparent,

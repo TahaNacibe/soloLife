@@ -1,5 +1,4 @@
 import 'package:SoloLife/app/core/utils/extensions.dart';
-import 'package:SoloLife/app/data/models/achivments.dart';
 import 'package:SoloLife/app/modules/home/controller.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';

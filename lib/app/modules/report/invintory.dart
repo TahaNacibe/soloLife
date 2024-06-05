@@ -1,19 +1,12 @@
 import 'dart:math';
-
 import 'package:SoloLife/app/core/utils/icon_pack_icons.dart';
 import 'package:SoloLife/app/core/utils/items_archive.dart';
-import 'package:SoloLife/app/core/values/item_drop.dart';
-import 'package:SoloLife/app/data/models/achivments.dart';
+import 'package:SoloLife/app/data/models/achievements.dart';
 import 'package:SoloLife/app/data/models/profile.dart';
 import 'package:SoloLife/app/data/models/shopItem.dart';
 import 'package:SoloLife/app/data/models/state.dart';
 import 'package:SoloLife/app/data/providers/task/provider.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
-import 'package:material_dialogs/dialogs.dart';
-import 'package:material_dialogs/shared/types.dart';
-import 'package:material_dialogs/widgets/buttons/icon_outline_button.dart';
 
 class Inventory extends StatefulWidget {
   const Inventory({super.key});
@@ -263,7 +256,6 @@ class _InventoryState extends State<Inventory> {
               padding: EdgeInsets.only(bottom: 8, left: 8),
               decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(15),
-                  //border: Border.all(color: color.withOpacity(.2),width: 1.5),
                   color: Theme.of(context).cardColor,
                   boxShadow: [
                     BoxShadow(
@@ -285,7 +277,6 @@ class _InventoryState extends State<Inventory> {
                         borderRadius: BorderRadius.circular(15)),
                   ),
 
-                  //Divider(),
                   Align(
                     alignment: Alignment.topRight,
                     child: Container(
@@ -341,7 +332,7 @@ class _InventoryState extends State<Inventory> {
       builder: (BuildContext context) {
         return AlertDialog(
           title: Text(
-            title,
+            title.contains("frame")? "Frame" : title,
             textAlign: TextAlign.center,
             style: TextStyle(fontWeight: FontWeight.bold, fontFamily: "Quick"),
           ),
@@ -512,7 +503,7 @@ class _InventoryState extends State<Inventory> {
                     size: 100,
                   ),
                   Text(
-                    "20 ~~ 1000 Runes can drop",
+                    "20 ~~ 100 Runes can drop",
                     style: TextStyle(
                         fontFamily: "Quick",
                         fontWeight: FontWeight.bold,

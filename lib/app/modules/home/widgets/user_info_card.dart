@@ -2,17 +2,15 @@ import 'dart:async';
 import 'dart:io';
 import 'package:SoloLife/app/core/utils/icon_pack_icons.dart';
 import 'package:SoloLife/app/core/values/jobs.dart';
-import 'package:SoloLife/app/data/models/achivments.dart';
+import 'package:SoloLife/app/data/models/achievements.dart';
 import 'package:SoloLife/app/data/models/profile.dart';
 import 'package:SoloLife/app/data/models/state.dart';
 import 'package:SoloLife/app/data/providers/task/provider.dart';
 import 'package:SoloLife/app/data/services/expScal/exp.dart';
-import 'package:SoloLife/app/settings/profile_edit.dart';
 import 'package:flutter/material.dart';
 import 'package:material_dialogs/dialogs.dart';
 import 'package:material_dialogs/shared/types.dart';
 import 'package:material_dialogs/widgets/buttons/icon_outline_button.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:step_progress_indicator/step_progress_indicator.dart';
 
 class UserInfoCard extends StatefulWidget {
@@ -23,38 +21,27 @@ class UserInfoCard extends StatefulWidget {
 }
 
 class _UserInfoCardState extends State<UserInfoCard> {
+  // read the profiles
+  Profile user = ProfileProvider().readProfile();
+  // initialize the vars
   late File coverPath;
   bool isThere = false;
   bool isThereCover = false;
   int tools = 0;
   bool theme = false;
+  bool isExpanded = false;
+  bool hide = false;
+  bool intOrNot = false;
+
   @override
   void initState() {
-    theme = ThemeProvider().loadTheme();
-    toolsCounter();
+    theme = ThemeProvider().loadTheme(); // get the theme
+    toolsCounter(); // get the number of active tools
     super.initState();
   }
 
 
-
-  Future<void> _loadCover() async {
-    final Directory appDirectory = await getApplicationDocumentsDirectory();
-    final String filePath = '${appDirectory.path}/cover_image.png';
-    if (await File(filePath).exists()) {
-      setState(() {
-        coverPath = File(filePath);
-        isThereCover = true;
-      });
-    } else {
-      setState(() {
-        coverPath = File("");
-        isThereCover = false;
-      });
-    }
-  }
-
-
-
+// count the active tools for the user
   void toolsCounter() {
     List<String> defaultKeysList = ["solo", "manager", "voltage"];
     user.keys!.every((element) {
@@ -64,10 +51,7 @@ class _UserInfoCardState extends State<UserInfoCard> {
       return true;
     });
   }
-
-  bool isExpanded = false;
-  bool hide = false;
-  bool intOrNot = false;
+  
 
   @override
   Widget build(BuildContext context) {
@@ -125,7 +109,7 @@ class _UserInfoCardState extends State<UserInfoCard> {
           return Colors.grey; // default color
       }
     }
-
+   // quick format for the coins number
     String formatNumber(int number) {
       if (number >= 1000000000) {
         return '${(number / 1000000000).toStringAsFixed(1)}B'; // Billion
@@ -138,13 +122,14 @@ class _UserInfoCardState extends State<UserInfoCard> {
       }
     }
 
-    //
+    // save the user state
     void fastSave() {
       state.points = state.points - 1;
       StatesProvider().writeState(state);
       setState(() {});
     }
 
+  // snack bar widget
     void snack(String text, bool failed) {
       final snackBar = SnackBar(
           backgroundColor: failed ? Colors.orange : Colors.green,
@@ -156,13 +141,14 @@ class _UserInfoCardState extends State<UserInfoCard> {
       ScaffoldMessenger.of(context).showSnackBar(snackBar);
     }
 
+  // change the user class
     void jobUpdate() {
       String selectedJob = weightedRandomSelection(jobs);
       updateClass(selectedJob, context);
-      //snack("New Class $selectedJob bones:${classReword(selectedJob,context)['message']}", false);
       achievementsHandler("job", context);
     }
 
+  // change class dialog
     void dialogBox() {
       Dialogs.materialDialog(
           msg: 'changing Class cost 40 point are you sure? ',
@@ -389,7 +375,7 @@ class _UserInfoCardState extends State<UserInfoCard> {
                                   colorGater(counterNumber), true, 18, 16)),
                           actionBarItem(
                               "Tools",
-                              "${tools-1}",
+                              "${tools - 1 < 0 ? 0 : tools - 1}",
                               Theme.of(context).iconTheme.color!,
                               false,
                               18,
@@ -512,6 +498,7 @@ class _UserInfoCardState extends State<UserInfoCard> {
                                                   )));
                                           ScaffoldMessenger.of(context)
                                               .showSnackBar(snackBar);
+                                          setState(() {});
                                         },
                                         child: Text(
                                           "Rank Up",
@@ -626,6 +613,7 @@ class _UserInfoCardState extends State<UserInfoCard> {
   }
 }
 
+// get the exp bar details
 int steps(int exp, int cap) {
   double newSteps = (exp * 100) / cap; // Divide cap by a factor
   int result = newSteps.round();
@@ -771,6 +759,8 @@ Widget actionBarItem(String title, String count, Color color, bool isIcon,
   );
 }
 
+
+// get the icon for each class
 IconData getClassIcon(String name) {
   IconData icon = Icons.abc_rounded;
   if (name == "Ranger") {

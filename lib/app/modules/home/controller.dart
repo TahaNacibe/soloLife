@@ -1,4 +1,4 @@
-import 'package:SoloLife/app/data/models/achivments.dart';
+import 'package:SoloLife/app/data/models/achievements.dart';
 import 'package:SoloLife/app/data/models/profile.dart';
 import 'package:SoloLife/app/data/models/task.dart';
 import 'package:SoloLife/app/data/providers/task/provider.dart';
@@ -9,8 +9,10 @@ import 'package:get/get.dart';
 import 'package:SoloLife/app/data/services/storage/repository.dart';
 
 class HomeController extends GetxController {
+  // initialize the storage
   TaskRepository taskRepository;
   HomeController({required this.taskRepository});
+  // initialize the variables
   final formKey = GlobalKey<FormState>();
   final editCtrl = TextEditingController();
   final tapIndex = 0.obs;
@@ -20,13 +22,14 @@ class HomeController extends GetxController {
   final task = Rx<Task?>(null);
   final doingTodos = <dynamic>[].obs;
   final doneTodos = <dynamic>[].obs;
+  // read profile data
   final Profile user = ProfileProvider().readProfile();
 
 
   @override
   void onInit() {
     super.onInit();
-    tasks.assignAll(taskRepository.readTasks());
+    tasks.assignAll(taskRepository.readTasks()); 
     ever(tasks, (_) => taskRepository.writeTasks(tasks));
   }
 
@@ -108,7 +111,6 @@ class HomeController extends GetxController {
     int level = user.level;
     int exp = getExpForTheTasks(level,isFree);
     int coins = getCoinsForTheTasks(isFree);
-    print("===========$coins");
     var todo = {'title': title, 'done': false,'exp':exp, 'coins':coins};
     if (doingTodos
         .any((element) => mapEquals<String, dynamic>(todo, element))) {
@@ -131,9 +133,7 @@ class HomeController extends GetxController {
       ...doingTodos,
       ...doneTodos,
     ]);
-    print(task.value);
     var newTask = task.value!.copyWith(todos: newTodos);
-    print(newTask);
     int oldIdx = tasks.indexOf(task.value);
     tasks[oldIdx] = newTask;
     tasks.refresh();
@@ -144,7 +144,6 @@ class HomeController extends GetxController {
     var doingTodo = {'title': title, 'done': false,"exp":addExp, "coins":coins};
     int index = doingTodos.indexWhere(
         (element) => mapEquals<String, dynamic>(doingTodo, element));
-        print("=============$index");
     doingTodos.removeAt(index);
     var doneTodo = {'title': title, 'done': true,"exp":addExp, "coins":coins};
     doneTodos.add(doneTodo);

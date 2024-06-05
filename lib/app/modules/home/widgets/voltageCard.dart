@@ -8,14 +8,19 @@ import 'package:get/get.dart';
 
 
 class VoltageCard extends StatelessWidget {
+  // initialize the storage
   final homeCtrl = Get.find<HomeController>();
+  // initialize the vars
   final List<Daily> tasks = DailyTasks().readTasks();
   final bool isBox;
+
   VoltageCard({super.key, required this.isBox});
 
   @override
   Widget build(BuildContext context) {
+    // initialize the vars
     var squareWidth = Get.width - 12.0.wp;
+    
     return isBox? GestureDetector(
       onTap: () {
        Navigator.pushNamed(context, "volt");

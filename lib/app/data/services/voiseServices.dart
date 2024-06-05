@@ -1,4 +1,4 @@
-import 'package:SoloLife/app/data/models/achivments.dart';
+import 'package:SoloLife/app/data/models/achievements.dart';
 import 'package:flutter/material.dart';
 import 'package:speech_to_text/speech_to_text.dart';
 
@@ -9,10 +9,10 @@ class CommandPage extends StatefulWidget {
   const CommandPage({Key? key}) : super(key: key);
 
   @override
-  _CommandPageState createState() => _CommandPageState();
+  listening createState() => listening();
 }
 
-class _CommandPageState extends State<CommandPage> {
+class listening extends State<CommandPage> {
   final SpeechToText _speechToText = SpeechToText();
 
   bool _speechEnabled = false;
@@ -25,25 +25,30 @@ class _CommandPageState extends State<CommandPage> {
   @override
   void initState() {
     super.initState();
-    initSpeech();
+    initSpeech(); // start the voice services
   }
 
+// Initializing speech services
   void initSpeech() async {
     _speechEnabled = await _speechToText.initialize();
     setState(() {});
   }
 
+
+  // Start listening for speech input
   void _startListening() async {
     await _speechToText.listen(onResult: _onSpeechResult);
     setState(() {
     });
   }
 
+  // Stop listening for speech input
   void _stopListening() async {
     await _speechToText.stop();
     setState(() {});
   }
 
+  // Handle the speech recognition result
   void _onSpeechResult(result) {
     setState(() {
       _wordsSpoken = "${result.recognizedWords}";
@@ -76,6 +81,7 @@ class _CommandPageState extends State<CommandPage> {
                     child:  ListView(
                       shrinkWrap: true,
                     children: [
+                      // Display speech recognition status and response
                       if(!commandLine)
                   Column(
                     children: [
@@ -110,6 +116,7 @@ class _CommandPageState extends State<CommandPage> {
                   ),
                   
                     if(commandLine)
+                    // Display command line for manual input
                   Column(children: [
                     Padding(
                       padding: const EdgeInsets.all(8.0),
@@ -160,6 +167,7 @@ class _CommandPageState extends State<CommandPage> {
                 )
               ],),
             ),
+            // Display close button and text
             Container(
               width: 100,
               decoration:BoxDecoration(

@@ -9,11 +9,14 @@ import 'package:step_progress_indicator/step_progress_indicator.dart';
 
 
 class DailyCard extends StatelessWidget {
+  // initialize the vars
   final homeCtrl = Get.find<HomeController>();
   final List<Daily> tasks = DailyTasks().readTasks();
   final bool isBox;
+
   DailyCard({super.key,required this.isBox});
 
+// get the finished number 
 int finished(){
   int finished = 0;
   for(Daily task in tasks){
@@ -25,8 +28,10 @@ int finished(){
 }
   @override
   Widget build(BuildContext context) {
+    // initialize the vars
     final color = const Color.fromARGB(255, 80, 39, 176);
     var squareWidth = Get.width - 12.0.wp;
+    
     return isBox? GestureDetector(
       onTap: () {
        Navigator.popAndPushNamed(context, "soloDetails");
