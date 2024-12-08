@@ -6,6 +6,7 @@ import 'package:SoloLife/app/data/models/achievements.dart';
 import 'package:SoloLife/app/data/models/profile.dart';
 import 'package:SoloLife/app/data/models/state.dart';
 import 'package:SoloLife/app/data/providers/task/provider.dart';
+import 'package:SoloLife/app/data/services/backup.dart';
 import 'package:SoloLife/app/data/services/expScal/exp.dart';
 import 'package:flutter/material.dart';
 import 'package:material_dialogs/dialogs.dart';
@@ -40,7 +41,6 @@ class _UserInfoCardState extends State<UserInfoCard> {
     super.initState();
   }
 
-
 // count the active tools for the user
   void toolsCounter() {
     List<String> defaultKeysList = ["solo", "manager", "voltage"];
@@ -51,7 +51,6 @@ class _UserInfoCardState extends State<UserInfoCard> {
       return true;
     });
   }
-  
 
   @override
   Widget build(BuildContext context) {
@@ -109,7 +108,8 @@ class _UserInfoCardState extends State<UserInfoCard> {
           return Colors.grey; // default color
       }
     }
-   // quick format for the coins number
+
+    // quick format for the coins number
     String formatNumber(int number) {
       if (number >= 1000000000) {
         return '${(number / 1000000000).toStringAsFixed(1)}B'; // Billion
@@ -129,7 +129,7 @@ class _UserInfoCardState extends State<UserInfoCard> {
       setState(() {});
     }
 
-  // snack bar widget
+    // snack bar widget
     void snack(String text, bool failed) {
       final snackBar = SnackBar(
           backgroundColor: failed ? Colors.orange : Colors.green,
@@ -141,14 +141,14 @@ class _UserInfoCardState extends State<UserInfoCard> {
       ScaffoldMessenger.of(context).showSnackBar(snackBar);
     }
 
-  // change the user class
+    // change the user class
     void jobUpdate() {
       String selectedJob = weightedRandomSelection(jobs);
       updateClass(selectedJob, context);
       achievementsHandler("job", context);
     }
 
-  // change class dialog
+    // change class dialog
     void dialogBox() {
       Dialogs.materialDialog(
           msg: 'changing Class cost 40 point are you sure? ',
@@ -346,6 +346,7 @@ class _UserInfoCardState extends State<UserInfoCard> {
                         children: [
                           GestureDetector(
                               onTap: () {
+                                // 
                                 snack("Your Current Player Rank", false);
                               },
                               child: actionBarItem("Rank", rank,
@@ -758,7 +759,6 @@ Widget actionBarItem(String title, String count, Color color, bool isIcon,
     ],
   );
 }
-
 
 // get the icon for each class
 IconData getClassIcon(String name) {

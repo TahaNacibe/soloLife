@@ -42,9 +42,9 @@ void achievementsHandler(String type, BuildContext context) {
   // if the watcher return nothing just ignore it, if it return something
   if (result.isNotEmpty) {
     // check if the achievement is already open
-    if (achievements.contains(result)) {
+    if (!achievements.contains(result)) {
       //if no added the achievement to the list
-      //user.achievements.add(result);
+      user.achievements.add(result);
       brief current = achievementsArchive[result]!;
       // getting the achievement reword based on it's rarity
       int expCount = current.rarity == 7
@@ -978,7 +978,7 @@ Map<String, brief> achievementsArchive = {
       description: "level up with no negative volts",
       isHidden: false),
   "flamenation": brief(
-      title: "Herrscher of ignition",
+      title: "Herrscher of flamenation",
       type: "reference",
       id: "flamenation",
       rarity: 4,

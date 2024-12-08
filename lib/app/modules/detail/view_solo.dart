@@ -71,7 +71,7 @@ class _SoloDetailState extends State<SoloDetail> {
                     BoxShadow(
                       color: Theme.of(context).shadowColor, // Shadow color
                       spreadRadius: 2, // Extends the shadow beyond the box
-                      blurRadius: 5, // Blurs the edges of the shadow
+                      blurRadius: 10, // Blurs the edges of the shadow
                       offset: const Offset(
                           0, 6), // Moves the shadow slightly down and right
                     )

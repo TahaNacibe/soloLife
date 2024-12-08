@@ -15,12 +15,11 @@ import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:get/get.dart';
-import 'package:SoloLife/app/core/utils/extensions.dart';
 import 'package:SoloLife/app/modules/home/controller.dart';
 import 'package:provider/provider.dart';
 import 'widgets/manager_card.dart';
 import 'widgets/solo_card.dart';
-import 'package:salomon_bottom_bar/salomon_bottom_bar.dart';
+import 'package:animated_bottom_navigation_bar/animated_bottom_navigation_bar.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -41,6 +40,7 @@ class _HomePageState extends State<HomePage> {
   // start the check process
   bool isThereCover = false;
   File cover = File("");
+  int navigationIndex = 0;
   List<String> defaultKeys = [
     "reverse",
     "master",
@@ -52,8 +52,8 @@ class _HomePageState extends State<HomePage> {
   ];
   // the tools that will be counted on
   List<String> defaultKeysList = ["solo", "manager", "voltage"];
-  
-  // check the existing of the cover 
+
+  // check the existing of the cover
   void coverCheck() {
     Profile user = ProfileProvider().readProfile();
     if (user.coverPath != "") {
@@ -69,7 +69,6 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
-
 // load the images for the profile and cover
   void _loadImages() {
     final profileImagePath = userInfo.pfpPath;
@@ -81,7 +80,7 @@ class _HomePageState extends State<HomePage> {
     });
   }
 
-// get the rank color  
+// get the rank color
   Color getRankColor(String rank) {
     switch (rank) {
       case "E":
@@ -546,43 +545,29 @@ class _HomePageState extends State<HomePage> {
         },
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-      bottomNavigationBar: Theme(
-        data: ThemeData(
-          splashColor: Colors.transparent,
-          highlightColor: Colors.transparent,
+      bottomNavigationBar:  AnimatedBottomNavigationBar(
+        shadow: Shadow(
+          color: Colors.grey.withOpacity(.5),
+          offset: Offset(0, 2),
+          blurRadius: 8
         ),
-        child: Obx(
-          () => BottomNavigationBar(
-            backgroundColor: Theme.of(context).cardColor,
-            elevation: 2,
-            onTap: (int index) => controller.changeTapIndex(index),
-            currentIndex: controller.tapIndex.value,
-            showSelectedLabels: false,
-            showUnselectedLabels: false,
-            items: [
-              BottomNavigationBarItem(
-                label: 'Home',
-                icon: Padding(
-                  padding: EdgeInsets.only(right: 15.0.wp),
-                  child: Icon(
-                    color: Theme.of(context).iconTheme.color,
-                    Icons.apps,
-                  ),
-                ),
-              ),
-              BottomNavigationBarItem(
-                label: 'Report',
-                icon: Padding(
-                  padding: EdgeInsets.only(left: 15.0.wp),
-                  child: Icon(
-                    color: Theme.of(context).iconTheme.color,
-                    Icons.data_usage,
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
+          inactiveColor: Theme.of(context).iconTheme.color,
+          activeColor: Colors.indigo,
+          backgroundColor: Theme.of(context).cardColor,
+          onTap: (int index) {
+            controller.changeTapIndex(index);
+            navigationIndex = index;
+            setState(() {});
+          },
+          splashColor: Theme.of(context).iconTheme.color,
+          gapLocation: GapLocation.center,
+          elevation: 100,
+          notchSmoothness: NotchSmoothness.verySmoothEdge,
+          leftCornerRadius: 15,
+          rightCornerRadius: 15,
+          activeIndex: navigationIndex,
+          icons: [Icons.apps, Icons.data_usage],
+        
       ),
     );
   }
@@ -672,4 +657,3 @@ void bottomSheet(int strike, BuildContext context) {
         );
       });
 }
-

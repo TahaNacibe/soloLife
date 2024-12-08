@@ -5,7 +5,9 @@ import 'package:SoloLife/app/data/models/achievements.dart';
 import 'package:SoloLife/app/data/models/profile.dart';
 import 'package:SoloLife/app/data/models/shopItem.dart';
 import 'package:SoloLife/app/data/providers/task/provider.dart';
+import 'package:SoloLife/app/data/services/admob_services.dart';
 import 'package:flutter/material.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 
 class Shop extends StatefulWidget {
   const Shop({super.key});
@@ -31,14 +33,16 @@ List<dynamic> box =
 class _ShopState extends State<Shop> {
   int coins = 0;
   String _timeDifference = "";
+  RewardedAd? _rewardedAd;
   @override
   void initState() {
     Profile user2 = ProfileProvider().readProfile();
     coins = user2.coins;
-    if(mounted){
-
-    _calculateTimeDifference();
+    if (mounted) {
+      _calculateTimeDifference();
     }
+    _createBannerAd();
+    _createRewardAd();
     super.initState();
   }
 
@@ -57,14 +61,65 @@ class _ShopState extends State<Shop> {
     });
   }
 
+  void _createBannerAd() {
+    _banner = BannerAd(
+        size: AdSize.fullBanner,
+        adUnitId: AdMobServices.bannerAdUnitId!,
+        request: const AdRequest(),
+        listener: AdMobServices.bannerAdListener)
+      ..load();
+  }
+
+  void _createRewardAd() {
+    RewardedAd.load(
+        adUnitId: AdMobServices.rewordAdUnitId!,
+        request: const AdRequest(),
+        rewardedAdLoadCallback: RewardedAdLoadCallback(
+            onAdLoaded: (ad) => setState(() => _rewardedAd = ad),
+            onAdFailedToLoad: (error) => setState(() => _rewardedAd = null)));
+  }
+
+  void _showRewardedAd() {
+    print("clicked");
+    if (_rewardedAd != null) {
+      _rewardedAd!.fullScreenContentCallback = FullScreenContentCallback(
+        onAdDismissedFullScreenContent: (ad) {
+          ad.dispose();
+          _createRewardAd();
+        },
+        onAdFailedToShowFullScreenContent: (ad, error) {
+          ad.dispose();
+          _createRewardAd();
+        },
+      );
+      _rewardedAd!.show(onUserEarnedReward: (ad, reword) {
+        user.inventory.add("CoinsBag");
+        ProfileProvider().saveProfile(user, "", context);
+        achievementsHandler("coins", context);
+        setState(() {});
+      });
+      _rewardedAd = null;
+    }
+  }
+
   // get user data as var user
   int infoIndexRune = 99999;
   int infoIndexBox = 99999;
   Profile user = ProfileProvider().readProfile();
+  BannerAd? _banner;
   @override
   Widget build(BuildContext context) {
     coins = user.coins;
     return Scaffold(
+      bottomNavigationBar: _banner == null
+          ? Container()
+          : Container(
+              margin: EdgeInsets.only(bottom: 12),
+              height: 52,
+              child: AdWidget(
+                ad: _banner!,
+              ),
+            ),
       appBar: AppBar(
         title: GestureDetector(
           onTap: () {
@@ -185,11 +240,8 @@ class _ShopState extends State<Shop> {
                             text: "Reset in ",
                           ),
                           TextSpan(
-                            text: "${_timeDifference}",
-                            style: TextStyle(
-                              color: Colors.indigo
-                            )
-                          )
+                              text: "${_timeDifference}",
+                              style: TextStyle(color: Colors.indigo))
                         ]),
                         style: TextStyle(
                             fontFamily: "Quick",
@@ -351,10 +403,11 @@ class _ShopState extends State<Shop> {
                         padding: const EdgeInsets.only(right: 8),
                         child: GestureDetector(
                           onTap: () {
-                            user.inventory.add("CoinsBag");
-                            ProfileProvider().saveProfile(user, "", context);
-                            achievementsHandler("coins", context);
-                            setState(() {});
+                            _showRewardedAd();
+                            // user.inventory.add("CoinsBag");
+                            // ProfileProvider().saveProfile(user, "", context);
+                            // achievementsHandler("coins", context);
+                            // setState(() {});
                           },
                           child: Container(
                               padding: EdgeInsets.all(12),

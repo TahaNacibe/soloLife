@@ -1,3 +1,4 @@
+import 'package:SoloLife/app/core/values/dark_theme.dart';
 import 'package:SoloLife/app/core/values/light_theme.dart';
 import 'package:SoloLife/app/data/models/profile.dart';
 import 'package:SoloLife/app/settings/welcome_page.dart';
@@ -24,6 +25,7 @@ import 'package:SoloLife/app/modules/home/view.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 
 void main() async {
   AwesomeNotifications().initialize(
@@ -56,6 +58,8 @@ void main() async {
   await Get.putAsync(() => StorageService().init());
   // Initialize Alarm Manager
   await AndroidAlarmManager.initialize();
+  // initialize the ads 
+  await MobileAds.instance.initialize();
   Get.put<DailyTasks>(DailyTasks());
   runApp(MyApp());
 }
@@ -68,7 +72,7 @@ class MyApp extends StatelessWidget {
     bool them = ThemeProvider().loadTheme();
     return GetMaterialApp(
       // theme for the app
-      theme: them ? ThemeData.dark() : lightTheme,
+      theme: them ? darkTheme : lightTheme,
       // routes map
       routes: {
         "commandPage": (context) => const CommandPage(),

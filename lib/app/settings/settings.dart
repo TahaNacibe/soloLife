@@ -3,6 +3,7 @@ import 'package:SoloLife/app/core/utils/icon_pack_icons.dart';
 import 'package:SoloLife/app/data/models/achievements.dart';
 import 'package:SoloLife/app/data/models/profile.dart';
 import 'package:SoloLife/app/data/providers/task/provider.dart';
+import 'package:SoloLife/app/data/services/backup.dart';
 import 'package:SoloLife/app/data/services/voiceCommand/service.dart';
 import 'package:SoloLife/app/settings/dialogAlert.dart';
 import 'package:flutter/material.dart';
@@ -37,7 +38,7 @@ class _SettingsState extends State<Settings> {
     String message = user.achievements.contains("box")
         ? "You can handel most actions here or use the box Console"
         : "You can handel most actions here or ■ ■ ■ ■";
-        // load the theme state
+    // load the theme state
     bool mood = ThemeProvider().loadTheme();
     // ui
     return PopScope(
@@ -201,12 +202,35 @@ class _SettingsState extends State<Settings> {
               );
             }, Icons.delete, "all your data will be deleted"),
 
+            //
+            settingsItem("BuckUp", () {
+              fastSaveBackup();
+              snack("File Saved in the download folder", false);
+            }, Icons.download_outlined, ""),
+            //
+            settingsItem("Restore data", () {
+              getData(context);
+              snack("Data Imported Complete", true);
+              setState(() {});
+            }, Icons.refresh, ""),
             //info tab
             settingsItem("Version 1.0", () {}, Icons.info, ""),
           ],
         )),
       ),
     );
+  }
+
+  // snack bar widget
+  void snack(String text, bool failed) {
+    final snackBar = SnackBar(
+        backgroundColor: failed ? Colors.orange : Colors.green,
+        content: Text(text,
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              fontFamily: "Quick",
+            )));
+    ScaffoldMessenger.of(context).showSnackBar(snackBar);
   }
 
   Widget keysItem(String title, IconData icon, void Function() refresh,
